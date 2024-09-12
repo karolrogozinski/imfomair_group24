@@ -30,3 +30,5 @@ def prepare_data(path: str, drop_duplicates: bool = False) -> tuple:
     X_train, X_test, y_train, y_test = train_test_split(
         df['sentence'], df['target'], test_size=0.15, random_state=42)
     return X_train, X_test, y_train, y_test
+
+# TODO implement Bag of Words
