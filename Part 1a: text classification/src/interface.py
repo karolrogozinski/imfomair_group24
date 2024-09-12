@@ -8,6 +8,9 @@ from .evaluation import Evaluation
 
 
 class Interface:
+    """
+    # TODO add docstring
+    """
     def __init__(self, datapath: str, model: str, drop_duplicates: bool, ) -> None:
         self.datapath: str = './data/' + datapath
         self.model_name: str = model
