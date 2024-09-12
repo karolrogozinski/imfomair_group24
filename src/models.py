@@ -65,15 +65,14 @@ class BaselineRuleBased(Model):
         Return:
         str
             predicted class for given sentence
-
-        [Feel free to change to the rules for better accuracy :)]
         """
+        # TODO improve rules for better accuracy
         if any(word in x for word in
                ['address', 'phone', 'what is', 'food', 'post']):
             return 'request'
         if any(word in x for word in ['how about', 'else', 'what about']):
             return 'reqalts'
-        if any(word in x for word in ['cough', 'unintelligable', 'sil']):
+        if any(word in x for word in ['cough', 'unintelligible', 'sil']):
             return 'null'
         if any(word in x for word in ['no']):
             return 'negate'
@@ -93,3 +92,5 @@ class BaselineRuleBased(Model):
         if any(word in x for word in ['wrong']):
             return 'deny'
         return 'inform'
+
+# TODO add at least 2 ML models

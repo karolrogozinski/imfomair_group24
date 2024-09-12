@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--model', dest='model_name', default='bm',
                         help="""Model to train and predict:
                                 bm: BaselineMajor
-                                br: BaselineRuleBased""")  # TODO add more models after implementation
+                                brb: BaselineRuleBased""")  # TODO add more models after implementation
     parser.add_argument('-dd', '--drop_duplicates', dest='drop_duplicates', default=False, type=bool,
                         help='Drop duplicate entries from data')
 
