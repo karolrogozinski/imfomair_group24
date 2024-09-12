@@ -10,6 +10,16 @@ import matplotlib.pyplot as plt
 
 
 class Evaluation:
+    """Class contains all evaluation metric
+
+    Methods
+    accuracy()
+        basic evaluation metric given in the assigment
+    save_confusion_matrix()
+        creates confusion matrix which compares predictions with actual classes and saves to png format
+    """
+    # TODO Implement more evaluations
+
     def __init__(self, y_true: pd.Series, y_pred: pd.Series) -> None:
         self.y_true: pd.Series = y_true
         self.y_pred: pd.Series = y_pred
@@ -30,5 +40,3 @@ class Evaluation:
 
         plt.savefig(f'./tmp/conf_matrix_{datetime.now()}.png')
         print('Confusion matrix saved to tmp directory.')
-
-    # TODO Implement more evaluations and motivate your choice

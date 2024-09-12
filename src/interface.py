@@ -1,8 +1,11 @@
 import sys
 
+import pandas as pd
+
 from .utils import prepare_data
 from .models import BaselineMajor, BaselineRuleBased
 from .evaluation import Evaluation
+
 
 class Interface:
     def __init__(self, datapath: str, model: str, drop_duplicates: bool, ) -> None:
@@ -17,11 +20,12 @@ class Interface:
         self.__train_model()
         self.__predict()
         self.__evaluate()
+        self.__manual_prediction()
 
     @staticmethod
     def __welcome() -> None:
         print('\n###################################')
-        print('Welcome in our sentence classification application!\n')
+        print('Welcome in our text classification app!\n')
 
     def __read_data(self) -> None:
         print('Reading data...')
@@ -61,3 +65,16 @@ class Interface:
         # TODO add more evaluations after implementation
         evaluation.save_confusion_matrix()
         print('\n-----------------------------------')
+
+    @staticmethod
+    def __input_sentence():
+        print('Please enter your sentence, or type "quit" to exit')
+        sentence = input()
+        return sentence
+
+    def __manual_prediction(self):
+        sentence = Interface.__input_sentence()
+        while sentence != 'quit':
+            prediction = self.__model.predict(pd.Series(sentence.lower()))
+            print(f'Prediction: {str(prediction[0])}')
+            sentence = Interface.__input_sentence()
