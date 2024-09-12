@@ -17,7 +17,7 @@ def prepare_data(path: str, drop_duplicates: bool = False) -> tuple:
     Returns:
     ---
     tuple
-        list of data splitted into X_train, X_test, y_train, y_test
+        list of data split into X_train, X_test, y_train, y_test
     """
     df = pd.read_csv(path, names=['sentence'])
 

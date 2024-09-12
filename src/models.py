@@ -16,7 +16,7 @@ class Model:
     def fit(self, X_train: list, y_train: list) -> None:
         ...
 
-    def predict(self, X_test: pd.Series) -> list:
+    def predict(self, X_test: list) -> list:
         ...
 
 
@@ -40,7 +40,7 @@ class BaselineMajor(Model):
         return y_pred
 
 
-class BaselineRulebased(Model):
+class BaselineRuleBased(Model):
     """ Simple model that returns predictions based on given rules.
     """
     def __init__(self):
@@ -50,7 +50,7 @@ class BaselineRulebased(Model):
         ...
 
     def predict(self, X_test: pd.Series) -> list:
-        y_pred = X_test.apply(lambda x: BaselineRulebased.__predict_sample(x))
+        y_pred = X_test.apply(lambda x: BaselineRuleBased.__predict_sample(x))
         return y_pred
 
     @staticmethod
