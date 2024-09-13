@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
 
 
 class Model:
@@ -93,4 +95,29 @@ class BaselineRuleBased(Model):
             return 'deny'
         return 'inform'
 
-# TODO add at least 2 ML models
+class LogisticRegressorModel(Model):
+    
+    def fit(self, X_train: list, y_train: list) -> None:
+        # Train the lr model.
+        self.lr_model = LogisticRegression(random_state = 42).fit(X_train, y_train)
+
+    def predict(self, X_test):
+        # Make predictions and return as pandas series.
+        self.predictions = self.lr_model.predict(X_test)
+
+        return pd.Series(self.predictions)
+
+class FeedForwardNN(Model):
+
+    def fit(self, X_train: list, y_train: list) -> None:
+        # Train the fnn model. Do we need to make hyperparameter tuning?
+            # The project description does not ask us to divide development data for such hyper parameter tuning.
+        self.fnn_model = MLPClassifier(random_state=42, max_iter=300, solver="adam").fit(X_train, y_train)
+
+    def predict(self, X_test):
+        # Make predictions and return as pandas series.
+        self.predictions = self.fnn_model.predict(X_test)
+
+        return pd.Series(self.predictions)
+
+
