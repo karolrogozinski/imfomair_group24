@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 from .utils import prepare_data, prepare_data_bow
-from .models import BaselineMajor, BaselineRuleBased, LogisticRegressorModel
+from .models import BaselineMajor, BaselineRuleBased, LogisticRegressorModel, FeedForwardNN
 from .evaluation import Evaluation
 
 
@@ -42,6 +42,9 @@ class Interface:
             sys.exit(1)
 
     def __read_data_bow(self) -> None:
+        # Implemented this in a different function because numeric BoW data is completely different from the
+            # string data the baseline models use.
+            # We will need the vectorizer to vectorize single input sentences coming from the console.
         print("Reading data in BoW format...")
         try:
             self.__X_train_bow, self.__X_test_bow, self.__y_train_bow, self.__y_test_bow, self.vectorizer = prepare_data_bow(
@@ -60,12 +63,15 @@ class Interface:
             self.__model = BaselineRuleBased()
         elif self.model_name == 'lr':
             self.__model = LogisticRegressorModel()
+        elif self.model_name == 'fnn':
+            self.__model = FeedForwardNN()
         else:
             print('Model not found!')
             sys.exit(2)
 
     def __train_model(self) -> None:
         print('Training model...')
+        # if the model is logistic regression of feed forward nn, then we use BoW data
         if self.model_name in ('lr', 'fnn'):
             self.__model.fit(self.__X_train_bow, self.__y_train_bow)
         else:
@@ -73,6 +79,7 @@ class Interface:
 
     def __predict(self) -> None:
         print('Predicting...')
+        # if the model is logistic regression of feed forward nn, then we use BoW data
         if self.model_name in ('lr', 'fnn'):
             self.__y_pred = self.__model.predict(self.__X_test_bow)
         else:
@@ -97,6 +104,7 @@ class Interface:
     def __manual_prediction(self):
         sentence = Interface.__input_sentence()
         while sentence != 'quit':
+            # if we are to use BoW data with lr or fnn, then we need to vectorize the console input too.
             if self.model_name in ('lr', 'fnn'):
                 prediction = self.__model.predict(self.vectorizer.transform(pd.Series(sentence.lower())))
             else:    

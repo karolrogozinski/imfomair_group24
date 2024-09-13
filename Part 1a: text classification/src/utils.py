@@ -33,7 +33,7 @@ def prepare_data(path: str, drop_duplicates: bool = False) -> tuple:
         
     return X_train, X_test, y_train, y_test
 
-# TODO implement Bag of Words
+
 # BoW implementation through sklearn CountVectorizer. We can personalize the implementation if we have to.
 def prepare_data_bow(path: str, drop_duplicates: bool = False) -> tuple:
         """
