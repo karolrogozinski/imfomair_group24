@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 
 
 class Model:
@@ -94,3 +95,13 @@ class BaselineRuleBased(Model):
         return 'inform'
 
 # TODO add at least 2 ML models
+class LogisticRegressorModel(Model):
+    
+    def fit(self, X_train: list, y_train: list) -> None:
+        self.lr_model = LogisticRegression().fit(X_train, y_train)
+
+    def predict(self, X_test): # Can delete this y_test since score will be calculated in evaluation part.
+        self.predictions = self.lr_model.predict(X_test)
+
+        return pd.Series(self.predictions)
+
