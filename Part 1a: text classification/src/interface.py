@@ -92,6 +92,7 @@ class Interface:
         evaluation = Evaluation(y_pred=self.__y_pred, y_true=self.__y_test)
         evaluation.accuracy()
         # TODO add more evaluations after implementation
+        evaluation.precision_recall_f1()
         evaluation.save_confusion_matrix()
         print('\n-----------------------------------')
 
