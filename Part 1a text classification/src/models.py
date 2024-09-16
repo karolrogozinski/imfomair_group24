@@ -70,26 +70,32 @@ class BaselineRuleBased(Model):
         """
         # TODO improve rules for better accuracy
         if any(word in x for word in
-               ['address', 'phone', 'what is', 'food', 'post']):
+               ['address', 'phone', 'what is', 'post']):
             return 'request'
-        if any(word in x for word in ['how about', 'else', 'what about']):
-            return 'reqalts'
-        if any(word in x for word in ['cough', 'unintelligible', 'sil']):
-            return 'null'
+        if x == 'yes':
+            return 'affirm'
         if any(word in x for word in ['no']):
             return 'negate'
+        if any(word in x for word in ['how about', 'else', 'what about']):
+            return 'reqalts'
+        if any(word in x for word in ['hi', 'hello', 'halo']):
+            return 'hello'
+        if any(word in x for word in ['cough', 'unintelligible', 'sil']):
+            return 'null'
         if (x.startswith('does') or x.startswith('is')) and\
                 x.split()[1] in ['it', 'they', 'that']:
             return 'confirm'
         if any(word in x for word in ['thank']):
             return 'thankyou'
-        if any(word in x for word in ['hi', 'hello']):
-            return 'hello'
         if any(word in x for word in ['again', 'repeat', 'back']):
             return 'repeat'
+        if any(word in x for word in ['kay', 'okay']):
+            return 'ack'
+        if any(word in x for word in ['bye']):
+            return 'bye'
         if x == 'more':
             return 'reqmore'
-        if any(word in x for word in ['start', 'reset', 'over', 'again']):
+        if any(word in x for word in ['start', 'reset']):
             return 'restart'
         if any(word in x for word in ['wrong']):
             return 'deny'
