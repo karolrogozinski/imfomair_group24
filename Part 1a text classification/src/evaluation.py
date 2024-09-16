@@ -41,7 +41,7 @@ class Evaluation:
         sns.heatmap(matrix, annot=True, fmt=".0%", cmap='Blues', xticklabels=class_names, yticklabels=class_names)
         plt.xlabel('Actual')
         plt.ylabel('Predictions')
-        plt.savefig(f'./tmp/conf_matrix_{datetime.now()}.png')
+        # plt.savefig(f'./tmp/conf_matrix_{datetime.now()}.png')
         print('Confusion matrix saved to tmp directory.')
 
     def show_misclassified(self) -> None:
