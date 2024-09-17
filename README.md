@@ -1,4 +1,4 @@
-# INFOMAIR 2024, group 24
+# Methods in AI Research 2024, group 24
 
 ## Project overview
 The practical part of the course consists of a team project in which you will design, implement, evaluate and write about a restaurant recommendations dialog system using various methods from AI, such as domain modeling, text classification using machine learning and user experience testing. The project is divided into two parts. 
