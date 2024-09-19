@@ -1,0 +1,4 @@
+Some states:
+* inform -> save information
+* restaurant not found -> reqalts (only update given info)
+* after not understanding reqalts twice, system made a random suggestion of italian instead of indian.
