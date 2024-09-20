@@ -12,7 +12,9 @@
 * reqalts(new info) -> change new info fields, make a new suggestion, but a different restaurant.
 * I guess the user asks for alternative only after receiving a suggestion. So reqalts is useful only after suggestion state. But it can come anytime as the user can always be typing randomly.
 * speech act = affirm -> proceed current state. I am not sure we would receive any affirms. Since in the dialogues affirm usually comes after the system asks a question.
-* speech act = restart -> repeat the last response. Thats what is done in the dialog data.
+* speech act = **restart** -> repeat the last response. Thats what is done in the dialog data.
+* speech act = **reject** -> There are no rejects in the dialog data.
+* speech act = **reqmore** -> there 5 of these in the data and the system repeats last sentence.
 
 
 
@@ -25,6 +27,7 @@
 * There's a weird type attribute the system always fills with "restaurant". I think it's useless.
 * What about task=find? I think that's useless too.
 * Task 06492: the system cant fully understand "care" prompt and asks follow up questions. After the follow-up questions it still knows what is the subject at that point. It's an important example but I think it can be the work of the next week.
+* Lets say the user requests before there is no restaurant selected, is it ok to just repeat last response?
 
 
 # Look Agains:
