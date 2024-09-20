@@ -16,12 +16,21 @@
 
 
 # General Info:
-* We can get info through inform, confirm, reqalts
+* We can get info through inform, confirm, reqalts, negate
 
 
 # Questions:
 * Why does our system ask follow up questions. Like user says British restaurant, system asks: British, right? If it got the British why does it ask? Is there confidence? What kind of a state is that?
+* There's a weird type attribute the system always fills with "restaurant". I think it's useless.
+* What about task=find? I think that's useless too.
 
 
 # Look Agains:
 * How does the system behave after speechAct: null?
+* negate (06417)
+* confirm (06417, 05628) does it change the suggestion after a confimation?
+* It looks like if there's an inform after suggestion, the system does not change suggestion but repeat relevant information to the user: (06417, 12396)
+* Does speechAct thankyou end dialog alone (02286)
+* affirm (02826)
+* sometimes the system makes a suggestion without ever asking for a missing info field. (01932) Maybe we can do: if at least 1 info field is known then make a suggestion with x% prob and ask for missing fields with 100-x% probability.
+* 
