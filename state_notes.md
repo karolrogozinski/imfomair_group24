@@ -12,6 +12,7 @@
 * reqalts(new info) -> change new info fields, make a new suggestion, but a different restaurant.
 * I guess the user asks for alternative only after receiving a suggestion. So reqalts is useful only after suggestion state. But it can come anytime as the user can always be typing randomly.
 * speech act = affirm -> proceed current state. I am not sure we would receive any affirms. Since in the dialogues affirm usually comes after the system asks a question.
+* speech act = restart -> repeat the last response. Thats what is done in the dialog data.
 
 
 
