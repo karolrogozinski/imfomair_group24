@@ -67,6 +67,7 @@ class Interface:
         self.__y_pred = self.__model.predict(self.__X_test)
 
     def __evaluate(self) -> None:
+        # TODO separate saving as the Evaluation method?
         print('Evaluating...')
         filename = f'./reports/eval/{datetime.now()}_eval_report.txt'
 
