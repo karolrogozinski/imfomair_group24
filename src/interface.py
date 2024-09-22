@@ -3,31 +3,37 @@ from datetime import datetime
 
 import pandas as pd
 
-from src.utils import prepare_data
+from src.utils import prepare_data, get_possible_choices, get_possible_restaurants
 from src.models import BaselineMajor, BaselineRuleBased, LogisticRegressorModel, FeedForwardNN
 from src.evaluations import ClassifierEvaluation
-
+from src.state_machine import DialogSMLogic
 
 class Interface:
     """
     # TODO add docstring
     """
-    def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool) -> None:
+    def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool, task: str) -> None:
         self.datapath: str = './data/' + datapath
         self.model_name: str = model
         self.drop_duplicates: bool = drop_duplicates
         self.bow_model = True if model in ('lr', 'fnn') else False
         self.eval: bool = evaluate
+        self.task: str = task
 
     def run(self) -> None:
-        Interface.__welcome()
         self.__read_data()
         self.__read_model()
         self.__train_model()
         if self.eval:
             self.__predict()
             self.__evaluate()
-        self.__manual_prediction()
+        if self.task == '1A':
+            Interface.__welcome()
+            self.__manual_prediction()
+        elif self.task == '1B':
+            self.__simple_dialog()
+        else:
+            pass # TODO part 1C
 
     @staticmethod
     def __welcome() -> None:
@@ -103,3 +109,15 @@ class Interface:
                 prediction = self.__model.predict(pd.Series(sentence.lower()))
             print(f'Prediction: {str(prediction[0])}')
             sentence = Interface.__input_sentence()
+
+    def __simple_dialog(self):
+        print('\n###################################')
+        possible_choices = get_possible_choices('./data/restaurant_info.csv')
+        possible_restaurants = get_possible_restaurants('./data/restaurant_info.csv')
+
+        sm = DialogSMLogic(possible_choices, self.__model, self.vectorizer, possible_restaurants)
+        while True:
+            sentence = input()
+            print('')
+            sm.state_transition(sentence)
+

@@ -11,6 +11,8 @@ if __name__ == '__main__':
     # -f FILENAME -m MODEL -dd DROP_DUPLICATES -e EVALUATE
     parser.add_argument('-f', '--filename', dest='datapath',
                         default='dialog_acts.dat', help='File in data folder in .dat format')
+    parser.add_argument('-t', '--task', dest='task',
+                        default='1B', help='Project subpart to run')
     parser.add_argument('-m', '--model', dest='model_name', default='fnn',
                         help="""Model to train and predict:
                                 bm: BaselineMajor
@@ -27,5 +29,5 @@ if __name__ == '__main__':
     args.drop_duplicates = True if args.drop_duplicates == 'True' else False
 
     interface = Interface(datapath=args.datapath, model=args.model_name, drop_duplicates=args.drop_duplicates,
-                          evaluate=args.evaluate)
+                          evaluate=args.evaluate, task=args.task)
     interface.run()

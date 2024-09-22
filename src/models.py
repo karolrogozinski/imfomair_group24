@@ -120,9 +120,9 @@ class LogisticRegressorModel(Model):
 
     def predict(self, X_test):
         # Make predictions and return as pandas series.
-        self.predictions = self.lr_model.predict(X_test)
+        predictions = self.lr_model.predict(X_test)
 
-        return pd.Series(self.predictions)
+        return pd.Series(predictions)
 
 class FeedForwardNN(Model):
 
@@ -136,5 +136,3 @@ class FeedForwardNN(Model):
         self.predictions = self.fnn_model.predict(X_test)
 
         return pd.Series(self.predictions)
-
-

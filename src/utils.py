@@ -4,6 +4,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 
+from typing import Dict, List
+
+
+# TODO change docstring styles
 
 def prepare_data(path: str, drop_duplicates: bool = False, vectorize: bool = False) -> tuple:
     """Preparing data for modeling - creating target, getting lowercase,
@@ -45,3 +49,25 @@ def vectorize_data(X_train: np.array, X_test: np.array) -> tuple:
     X_train = vectorizer.fit_transform(X_train)
     X_test = vectorizer.transform(X_test)
     return X_train, X_test, vectorizer
+
+
+def get_possible_restaurants(path: str) -> pd.DataFrame:
+    return pd.read_csv(path)
+
+
+def get_possible_choices(path: str) -> Dict[str, List]:
+    """ Prepares all possible choice for each restaurant field
+    """
+    df_dialogues = pd.read_csv(path)
+
+    price_range_list = df_dialogues['pricerange'].unique()
+    area_list = df_dialogues['area'].unique()[:-1]
+    food_list = df_dialogues['food'].unique()
+
+    choices: dict = {
+        'food': food_list,
+        'area': area_list,
+        'pricerange': price_range_list,
+    }
+
+    return choices
