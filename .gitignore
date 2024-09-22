@@ -1,4 +1,6 @@
 .idea
 .DS_Store
-# just to ignore my venv
-/venv
+src/__pycache__
+reports/eval/
+venv
+playgroud.ipynb

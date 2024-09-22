@@ -1,9 +1,22 @@
-# Methods in AI Research 2024, group 24
+# Restaurant reccomendations dialog system
+Project consists a design, implementation, evaluatation and reports about a restaurant recommendations dialog system using various methods from AI, such as domain modeling, text classification using machine learning and user experience testing. 
 
-## Project overview
-The practical part of the course consists of a team project in which you will design, implement, evaluate and write about a restaurant recommendations dialog system using various methods from AI, such as domain modeling, text classification using machine learning and user experience testing. The project is divided into two parts. 
+## Table of Contents
+
+1. [Purpose of the project](#purpose-of-the-project)
+2. [Requirements](#requirements)
+3. [Run](#run)
+4. [Data](#data)
+5. [Code Structure](#code-structure)
+6. [Experiments](#experiments)
+7. [References](#references)
+
+## Purpose of the project
+Project made for Utrecht University course [1].
+It is divided into two parts:
+
 1. The first part of the project concerns the implementation of the dialog system: modeling the domain in a dialog model, implementing and evaluating a machine learning classifier for natural language, and developing a text-based dialog system application based on the dialog model.
-2. The second part of the project is about evaluating your system: designing, carrying out and reporting on user experiments, as well as thinking about your system in the wider context of AI.
+2. The second part of the project is about evaluating system: designing, carrying out and reporting on user experiments, as well as thinking about your system in the wider context of AI.
 
 ### Learning goals for Part 1:
  - Understanding and modeling a specific knowledge domain
@@ -16,3 +29,90 @@ The practical part of the course consists of a team project in which you will de
  - Conducting an experiment with human participants as a way to test a hypothesis (and experiencing the difficulty of collecting good data, and why you need to think about this hard)
  - Analyzing empirical data using statistical techniques
  - Writing a scientific report about your system's empirical evaluation and its place in AI
+
+## Requirements
+The project was developed and test with ```python 3.9.12``` and libraries from [requirements.txt](requirements.txt):
+
+```txt
+- pandas=1.4.4
+- scikit-learn=1.0.2
+- numpy=1.23.5
+- seaborn=0.11.2
+- matplotlib=3.7.0
+- textdistance=4.2.1
+```
+
+## Run
+The easier way to run program is to run from main directory:
+
+```bash
+$ pip install -r /path/to/requirements.txt
+$ python3 main.py
+```
+
+However it can by adjusted with many arguments
+
+### Arguments
+```python
+# -f FILENAME -t TASK -m MODEL -dd DROP_DUPLICATES -e EVALUATE
+parser.add_argument('-f', '--filename', dest='datapath',
+                    default='dialog_acts.dat', help='File in data folder in .dat format')
+parser.add_argument('-t', '--task', dest='task',
+                    default='1B', help='Project subpart to run (1A, 1B, 1C')
+parser.add_argument('-m', '--model', dest='model_name', default='fnn',
+                    help="""Model to train and predict:
+                            bm: BaselineMajor
+                            brb: BaselineRuleBased
+                            lr: LogisticRegressio
+                            fnn: FeedForwardNeuralNetwork""")
+parser.add_argument('-dd', '--drop_duplicates', dest='drop_duplicates', action='store_true',
+                    help='Drop duplicate entries from data')
+parser.add_argument('-e', '--evaluate', dest='evaluate',action='store_true',
+                    help='Make evaluation and save it to file')
+```
+
+For example to run part 1A with baseline ruled-based model and dropped duplicates:
+```bash
+$ python3 main.py -t 1A -m brb -dd
+```
+
+## Data
+- [dialog_acts.dat](data/dialog_acts.dat): dialogs from the second Dialog State Tracking Challenge (DSTC 2, see https://www.microsoft.com/en-us/research/event/dialog-state-tracking-challenge/). The data consist of 3235 dialogs in the restaurant domain. Each dialog represents an interaction between a user and a system.
+- [restaurant_info.csv)](data/restaurant_info.csv): available restaurants database
+- [all_dialogs.txt](all_dialogs.txt): example dialogs for a system design inspiration
+
+## Code structure
+```
+├──  data
+│    └──  dialog_acts.dat
+│    └──  restaurant_info.csv)
+│    └──  all_dialogs.txt
+│
+│
+├──  reports
+│    └── eval
+│        └── {datetime}_eval_report.txt   - sample generated evaluation report
+│        └── {datetime}_conf_matrix.txt   - sample generated confusion matrix
+│
+│
+├──  src
+│    └──  evaluations.py                  - class contains all evaluation metrics
+│    └──  interface.py                    - main app interface
+│    └──  models.py                       - source code of the all models (baselines and ML)
+│    └──  state_machine.py                - dialog state machine logic and output implementation
+│    └──  utils.py                        - other functions like preparing data
+│
+│
+└──  main.py
+```
+
+## Experiments
+
+**TBA** October '24
+
+## References
+
+**[1]** [Methods in AI Research, UU course](https://osiris-student.uu.nl/onderwijscatalogus/extern/cursus?cursuscode=INFOMAIR&taal=en&collegejaar=huidig)
+
+
+

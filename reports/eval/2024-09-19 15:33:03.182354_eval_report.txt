@@ -1,0 +1,30 @@
+
+-----------------------------------
+MODEL METRICS
+Model: fnn, Drop duplicates: False
+Accuracy: 0.9864087820177732
+Classification Report:
+              precision    recall  f1-score   support
+
+         ack       1.00      0.20      0.33         5
+      affirm       0.99      0.99      0.99       180
+         bye       0.95      1.00      0.97        35
+     confirm       0.85      0.77      0.81        22
+        deny       1.00      1.00      1.00         6
+       hello       1.00      1.00      1.00        14
+      inform       0.99      0.98      0.99      1532
+      negate       1.00      1.00      1.00        69
+        null       0.94      1.00      0.96       232
+      repeat       1.00      0.67      0.80         3
+     reqalts       0.96      0.97      0.97       279
+     reqmore       1.00      1.00      1.00         1
+     request       0.99      1.00      0.99       972
+     restart       1.00      1.00      1.00         2
+    thankyou       1.00      1.00      1.00       474
+
+    accuracy                           0.99      3826
+   macro avg       0.98      0.90      0.92      3826
+weighted avg       0.99      0.99      0.99      3826
+
+Confusion matrix saved to tmp directory.
+-----------------------------------
