@@ -15,12 +15,12 @@
     - [ ] 0.3pt: Quantitative evaluation, including data deduplication
     - [ ] 0.4pt: Error analysis
     - [ ] 0.1pt: Difficult instances
-  - [ ] **1.3pt Implementation**
-    - [ ] 0.2pt: Data loading and preprocessing
-    - [ ] 0.4pt: Baselines
-    - [ ] 0.3pt: Machine learning
-    - [ ] 0.1pt: Data deduplication
-    - [ ] 0.3pt: Code to perform evaluation
+  - [x] **1.3pt Implementation**
+    - [x] 0.2pt: Data loading and preprocessing
+    - [x] 0.4pt: Baselines
+    - [x] 0.3pt: Machine learning
+    - [x] 0.1pt: Data deduplication
+    - [x] 0.3pt: Code to perform evaluation
 
 - [ ] **2.5pt Part 1b**
   - [ ] **1.1pt Report**
