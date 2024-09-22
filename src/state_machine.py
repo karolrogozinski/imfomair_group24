@@ -102,11 +102,10 @@ class DialogSMLogic:
                 else:
                     self.next_state = 4
                     self.transition_dict[self.next_state](sentence)
+            self.current_field = tuple()
         else:
             self.next_state = 2
             self.dialog_args = tuple(unknown_fields)
-
-        self.current_field = tuple()
 
     def __state_2(self, sentence: str) -> None:
         self.next_state = 1
@@ -170,7 +169,7 @@ class DialogSMLogic:
         """ Update preferences for specified field based on given phrase
             and searches for antipathies that appear after the word 'no'.
         """
-        negations = re.findall(r'no ([a-zA-Z]+)', sentence)
+        negations = re.findall(r'(?:no|not) ([a-zA-Z]+)', sentence)
 
         info_exists = self.__update_likes(sentence, field, self.max_distance)
         self.__update_dislikes(negations, field, self.max_distance)
@@ -185,7 +184,7 @@ class DialogSMLogic:
     def __is_dontcare(sentence: str) -> bool:
         """ Predict if the user speechAct was dontcare, since is not one of the model class
         """
-        dontcare_words = ['any', 'dontcare']
+        dontcare_words = ['any', 'dontcare', 'doesnt matter']
         return any(word in sentence for word in dontcare_words)
 
     def __update_likes(self, sentence: str, field: str, max_distance: int) -> bool:
@@ -230,7 +229,6 @@ class DialogSMLogic:
         """
         possible_flag = 0
         possible_restaurants = pd.DataFrame()
-        self.current_restaurant = pd.DataFrame()
 
         for key in self.preferences.keys():
             if len(self.preferences[key]) > 0:
@@ -248,10 +246,10 @@ class DialogSMLogic:
                 possible_restaurants = self.restaurants_base[~self.restaurants_base[key].isin(self.antipathies[key])]
                 possible_flag = 1
 
+        if not possible_restaurants.empty and not self.current_restaurant.empty:
+            possible_restaurants = possible_restaurants[
+                possible_restaurants.restaurantname != self.current_restaurant.restaurantname]
         if not possible_restaurants.empty:
-            if not self.current_restaurant.empty and possible_restaurants.shape[0] > 1:
-                possible_restaurants = possible_restaurants[
-                    possible_restaurants.restaurantname != self.current_restaurant.restaurantname]
             self.current_restaurant = possible_restaurants.sample()
 
     def __parse_request(self, sentence: str) -> None:
