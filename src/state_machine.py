@@ -108,13 +108,15 @@ class DialogSMLogic:
             self.dialog_args = tuple(unknown_fields)
 
     def __state_2(self, sentence: str) -> None:
-        self.next_state = 1
-        self.transition_dict[self.next_state](sentence)
+        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
+            self.next_state = 1
+            self.transition_dict[self.next_state](sentence)
 
     def __state_3(self, sentence: str) -> None:
-        self.current_field = self.dialog_args
-        self.next_state = 1
-        self.transition_dict[self.next_state](sentence)
+        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
+            self.current_field = self.dialog_args
+            self.next_state = 1
+            self.transition_dict[self.next_state](sentence)
 
     def __state_4(self, sentence: str) -> None:
         self.__find_restaurant()
