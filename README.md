@@ -12,10 +12,7 @@ Project consists a design, implementation, evaluatation and reports about a rest
 7. [References](#references)
 
 ## Purpose of the project
-Project made for Utrecht University course:
-
-[Methods in AI Research](https://osiris-student.uu.nl/onderwijscatalogus/extern/cursus?cursuscode=INFOMAIR&taal=en&collegejaar=huidig)
-
+Project made for Utrecht University course [1].
 It is divided into two parts:
 
 1. The first part of the project concerns the implementation of the dialog system: modeling the domain in a dialog model, implementing and evaluating a machine learning classifier for natural language, and developing a text-based dialog system application based on the dialog model.
@@ -80,5 +77,42 @@ $ python3 main.py -t 1A -m brb -dd
 ```
 
 ## Data
+- [dialog_acts.dat](data/dialog_acts.dat): dialogs from the second Dialog State Tracking Challenge (DSTC 2, see https://www.microsoft.com/en-us/research/event/dialog-state-tracking-challenge/). The data consist of 3235 dialogs in the restaurant domain. Each dialog represents an interaction between a user and a system.
+- [restaurant_info.csv)](data/restaurant_info.csv): available restaurants database
+- [all_dialogs.txt](all_dialogs.txt): example dialogs for a system design inspiration
+
+## Code structure
+```
+├──  data
+│    └──  dialog_acts.dat
+│    └──  restaurant_info.csv)
+│    └──  all_dialogs.txt
+│
+│
+├──  reports
+│    └── eval
+│        └── {datetime}_eval_report.txt   - sample generated evaluation report
+│        └── {datetime}_conf_matrix.txt   - sample generated confusion matrix
+│
+│
+├──  src
+│    └──  evaluations.py                  - class contains all evaluation metrics
+│    └──  interface.py                    - main app interface
+│    └──  models.py                       - source code of the all models (baselines and ML)
+│    └──  state_machine.py                - dialog state machine logic and output implementation
+│    └──  utils.py                        - other functions like preparing data
+│
+│
+└──  main.py
+```
+
+## Experiments
+
+**TBA** October '24
+
+## References
+
+**[1]** [Methods in AI Research, UU course](https://osiris-student.uu.nl/onderwijscatalogus/extern/cursus?cursuscode=INFOMAIR&taal=en&collegejaar=huidig)
+
 
 
