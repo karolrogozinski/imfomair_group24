@@ -103,6 +103,9 @@ $ python3 main.py -t 1A -m brb -dd
 │    └──  utils.py                        - other functions like preparing data
 │
 │
+├──  tmp                                  - temporary markdown notes
+|
+|
 └──  main.py
 ```
 
