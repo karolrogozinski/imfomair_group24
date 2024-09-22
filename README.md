@@ -12,7 +12,7 @@ Project consists of a design, implementation, evaluatation and reports about a r
 7. [References](#references)
 
 ## Purpose of the project
-Project made for Utrecht University course [1](https://osiris-student.uu.nl/onderwijscatalogus/extern/cursus?cursuscode=INFOMAIR&taal=en&collegejaar=huidig).
+Project made for Utrecht University course [[1]](#references).
 It is divided into two parts:
 
 1. The first part of the project concerns the implementation of the dialog system: modeling the domain in a dialog model, implementing and evaluating a machine learning classifier for natural language, and developing a text-based dialog system application based on the dialog model.
