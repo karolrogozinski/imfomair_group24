@@ -351,8 +351,8 @@ Please provide {text} again.""".replace(
         if not options:
             text = ''
         else:
-            text = options[0]
-        print(f"""I am not sure about the results. Could you provide another{' ' + text + ' '}preference?""".replace(
+            text = ' ' + options[0] + ' '
+        print(f"""I am not sure about the results. Could you provide another{text}preference?""".replace(
             'food', 'cuisine type').replace('_', ' '))
 
     @staticmethod
