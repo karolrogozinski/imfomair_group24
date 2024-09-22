@@ -1,5 +1,5 @@
 # Restaurant reccomendations dialog system
-Project consists a design, implementation, evaluatation and reports about a restaurant recommendations dialog system using various methods from AI, such as domain modeling, text classification using machine learning and user experience testing. 
+Project consists of a design, implementation, evaluatation and reports about a restaurant recommendations dialog system using various AI methods, such as domain modeling, text classification using machine learning and user experience testing. 
 
 ## Table of Contents
 
@@ -12,7 +12,7 @@ Project consists a design, implementation, evaluatation and reports about a rest
 7. [References](#references)
 
 ## Purpose of the project
-Project made for Utrecht University course [1].
+Project made for Utrecht University course [1](https://osiris-student.uu.nl/onderwijscatalogus/extern/cursus?cursuscode=INFOMAIR&taal=en&collegejaar=huidig).
 It is divided into two parts:
 
 1. The first part of the project concerns the implementation of the dialog system: modeling the domain in a dialog model, implementing and evaluating a machine learning classifier for natural language, and developing a text-based dialog system application based on the dialog model.
@@ -31,7 +31,7 @@ It is divided into two parts:
  - Writing a scientific report about your system's empirical evaluation and its place in AI
 
 ## Requirements
-The project was developed and test with ```python 3.9.12``` and libraries from [requirements.txt](requirements.txt):
+The project was developed and tested with ```python 3.9.12``` and libraries from [requirements.txt](requirements.txt):
 
 ```txt
 - pandas=1.4.4
