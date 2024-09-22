@@ -65,7 +65,7 @@ class Interface:
             sys.exit(2)
 
     def __train_model(self) -> None:
-        print('Training model...')
+        print('Training model... (it may take a while)')
         self.__model.fit(self.__X_train, self.__y_train)
 
     def __predict(self) -> None:

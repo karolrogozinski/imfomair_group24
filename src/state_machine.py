@@ -175,7 +175,7 @@ class DialogSMLogic:
         self.__update_dislikes(negations, field, self.max_distance)
 
         if self.current_field and self.__is_dontcare(sentence) and not info_exists:
-            self.preferences[field] = self.possible_choices[field]
+            self.preferences[field] = self.possible_choices[field].tolist()
             info_exists = True
 
         return info_exists
@@ -246,11 +246,15 @@ class DialogSMLogic:
                 possible_restaurants = self.restaurants_base[~self.restaurants_base[key].isin(self.antipathies[key])]
                 possible_flag = 1
 
+        print(possible_restaurants.shape, self.current_restaurant.shape)
         if not possible_restaurants.empty and not self.current_restaurant.empty:
+            current_name = self.current_restaurant.restaurantname.iloc[0]
             possible_restaurants = possible_restaurants[
-                possible_restaurants.restaurantname != self.current_restaurant.restaurantname]
+                possible_restaurants.restaurantname != current_name]
         if not possible_restaurants.empty:
             self.current_restaurant = possible_restaurants.sample()
+        else:
+            self.current_restaurant = pd.DataFrame()
 
     def __parse_request(self, sentence: str) -> None:
         """ Parses the record for types of requested fields.
