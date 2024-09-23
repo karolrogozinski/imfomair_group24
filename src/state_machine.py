@@ -40,7 +40,7 @@ class DialogSMLogic:
 
     """
     def __init__(self, possible_choices: Dict[str, List[str]], model: Model, vectorizer: CountVectorizer,
-                 restaurants: pd.DataFrame, random_suggestion: float = 0.2, max_distance: int = 1) -> None:
+                 restaurants: pd.DataFrame, random_suggestion: float = 0.2, max_distance: int = 3) -> None:
         self.next_state: int = 0
         self.current_field: Tuple[str] = tuple()
         self.current_speech_act: str = 'info'
