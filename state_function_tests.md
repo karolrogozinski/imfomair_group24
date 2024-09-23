@@ -111,10 +111,25 @@ Me: "Whats the phone number?"
 
 SYS: speechAct: request, returns phone number.
 
-Me: Whats the address?
+Me: "Whats the address?"
 
 SYS: speechAct: request, return address AND ZIPCODE.
 
-Me: whats the postcode?
+Me: "whats the postcode?"
 
-SYS: speechAct
+SYS: speechAct: null, does not understand the request.
+
+Me: "whats the postcode"
+
+SYS: same
+
+Me: "whats the zipcode"
+
+SYS: same
+
+Me: "Whats the zipcode"
+
+SYS: same
+
+**It looks like the system doesnt understand requests for zipcode.**
+**Also, it always returns address and zipcode when the address is asked. In the dialogs data, system gives only the address when it is asked the addres and only the zipcode when it is asked the zipcode.**
