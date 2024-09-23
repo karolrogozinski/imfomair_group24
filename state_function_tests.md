@@ -86,6 +86,35 @@ Me: "another"
 
 SYS: same
 
+Me: "chinese, moderate"
+
+SYS: suggests graffiti. food: [indian, chinese]
+
 **When I say "any other" if the system sees it as inform why does it reply no such restaurants?**
 
 **When I try again with another, system understands that its reqalts but still replies no such restaurants. There are 4 other such restaurants which the system did not suggest yet.**
+
+**After saying there are no such restaurants, when I say chinese, moderate, the system gives me an indian restaurant in accordance with my previous choices. This is why I believe we should keep only 1 value in preference fields.**
+
+## 6. I start with indian, north, moderate
+SYS: suggests tandoori place
+
+Me: "this is indian, right?"
+
+SYS: speechAct: confirm, "Tandoori place is an indianrestaurant"
+
+Me: "it is expensive, correct?"
+
+SYS: speechAct: confirm, but returns the address and postcode.
+
+Me: "Whats the phone number?"
+
+SYS: speechAct: request, returns phone number.
+
+Me: Whats the address?
+
+SYS: speechAct: request, return address AND ZIPCODE.
+
+Me: whats the postcode?
+
+SYS: speechAct
