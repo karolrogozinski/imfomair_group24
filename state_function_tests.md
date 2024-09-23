@@ -55,3 +55,37 @@ Me: "british"
 SYS: adds british back to preferences[food] but doesnt remove it from antipaties.
 
 **I know I am the annoying tester here but I guess at the last step the system should remove british from antipaties, hehe.**
+
+## 4. Lavenstien Distance
+Me: "biritihs" edit_dist = 3
+
+SYS: doesnt get british.
+
+Me: "britihs" edit_dist = 2
+
+SYS: doesnt get british
+
+**The default value for max_distance=1, it should be 3 or 4 depending on the implementation. The document says if the distance is <= 3 then we should match the two words.**
+
+## 5. I start with indian, north, moderate
+SYS: "My suggestion is the nirala". 
+
+Me: "any other"
+
+SYS: speechAct: inform. "There is no restaurant with given parameters. Please provide any preferences again."
+
+Me: "another"
+
+SYS: speechAct: reqalts. "There is no restaurant with given parameters. Please provide any preferences again." But there is no change in preferences list.
+
+Me: "another"
+
+SYS: same
+
+Me: "another"
+
+SYS: same
+
+**When I say "any other" if the system sees it as inform why does it reply no such restaurants?**
+
+**When I try again with another, system understands that its reqalts but still replies no such restaurants. There are 4 other such restaurants which the system did not suggest yet.**
