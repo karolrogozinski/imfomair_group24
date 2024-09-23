@@ -53,3 +53,5 @@ SYS: adds british to antipaties and deletes it from preferences[food]
 Me: "british"
 
 SYS: adds british back to preferences[food] but doesnt remove it from antipaties.
+
+**I know I am the annoying tester here but I guess at the last step the system should remove british from antipaties, hehe.**
