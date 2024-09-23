@@ -133,3 +133,35 @@ SYS: same
 
 **It looks like the system doesnt understand requests for zipcode.**
 **Also, it always returns address and zipcode when the address is asked. In the dialogs data, system gives only the address when it is asked the addres and only the zipcode when it is asked the zipcode.**
+
+## I start with indian, moderate, north.
+SYS: gives a restaurant.
+
+Me: "nice, whats the zipcode?"
+
+SYS: speechAct: null, repeats previous answer.
+
+Me: "whats the address"
+
+SYS: speechAct: request, gives the address & the zipcode.
+
+Me: "postcode?"
+
+SYS: speechAct: request, "sorry, I dont understand your request."
+
+## I start with chinese, north (there is 1 such restaurant)
+SYS: asks the price range.
+
+Me: "dont care"
+
+SYS: asks for the price range again
+
+Me: "I dont care"
+
+SYS: "there is no restaurant with given parameters"
+
+Me: "any"
+
+SYS: suggests hotpot
+
+**any and dontcare are handled but not "dont care" this is not an important issue tho.**
