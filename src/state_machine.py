@@ -15,6 +15,16 @@ import textdistance
 from src.models import Model
 
 
+DONTCARE_WORDS = ['any', 'dontcare', 'doesnt matter', "don't care", "doesn't matter", 'whatever']
+REQUEST_WORDS = {
+    'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree'],
+    'address': ['place', 'where', 'area', 'address', 'postcode', 'addr', 'location', 'street', 'city',
+                'zipcode'],
+    'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
+    'pricerange': ['price', 'price range', 'cost', 'cheap', 'expensive'],
+}
+
+
 class DialogSMLogic:
     """ Basic implementation of the logic of dialog restaurant state machine.
         Allows to hold conversation by state transition made base on given sentence.
@@ -190,8 +200,7 @@ class DialogSMLogic:
     def __is_dontcare(sentence: str) -> bool:
         """ Predict if the user speechAct was dontcare, since is not one of the model class
         """
-        dontcare_words = ['any', 'dontcare', 'doesnt matter']
-        return any(word in sentence for word in dontcare_words)
+        return any(word in sentence for word in DONTCARE_WORDS)
 
     def __update_likes(self, sentence: str, field: str, max_distance: int) -> bool:
         current_word = None
@@ -256,7 +265,6 @@ class DialogSMLogic:
                 possible_restaurants = self.restaurants_base[~self.restaurants_base[key].isin(self.antipathies[key])]
                 possible_flag = 1
 
-        print(possible_restaurants.shape, self.current_restaurant.shape)
         if not possible_restaurants.empty and not self.current_restaurant.empty:
             current_name = self.current_restaurant.restaurantname.iloc[0]
             possible_restaurants = possible_restaurants[
@@ -270,24 +278,16 @@ class DialogSMLogic:
         """ Parses the record for types of requested fields.
             Similarly to searching preferences Lavenshtein distance is applied.
         """
-        request_dict = {
-            'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree'],
-            'address': ['place', 'where', 'area', 'address', 'postcode', 'addr', 'location', 'street', 'city',
-                        'zipcode'],
-            'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
-            'pricerange': ['price', 'price range', 'cost'],
-        }
-
         requests = list()
 
         for word in sentence.split():
-            for request in request_dict.keys():
-                for value in request_dict[request]:
+            for request in REQUEST_WORDS.keys():
+                for value in REQUEST_WORDS[request]:
                     if textdistance.levenshtein(word, value) <= self.max_distance:
-                        requests.append(value)
+                        requests.append(request)
                         continue
 
-        self.__prepare_requested_fields(list(set(requests)) or [random.choice(list(request_dict.keys()))])
+        self.__prepare_requested_fields(list(set(requests)) or [random.choice(list(REQUEST_WORDS.keys()))])
 
     def __prepare_requested_fields(self, requests: List[str]) -> None:
         """Sets up information for dialogs based on requested fields.
@@ -410,11 +410,11 @@ Do you have any other preferences or this suggestion satisfies you and want to h
             text += name.title() + ' is '
 
             if food and price_range:
-                text += food + ', ' + price_range + 'restaurant'
+                text += food + ', ' + price_range + ' restaurant'
             elif food:
-                text += food + 'restaurant'
+                text += food + ' restaurant'
             else:
-                text += price_range + 'restaurant'
+                text += price_range + ' restaurant'
 
             if options[4]:
                 area = options[4][0]
@@ -422,10 +422,10 @@ Do you have any other preferences or this suggestion satisfies you and want to h
                 zipcode = options[4][2]
                 text += ' located in the ' + area + 'part of the town at ' + address + ', ' + zipcode
 
-            text += '.'
+            text += '. '
 
         if phone:
-            text += ' To contact them you can call ' + phone + '.'
+            text += 'To contact them you can call ' + phone + '.'
 
         print(text or 'Sorry I do not understand your request.')
 
