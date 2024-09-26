@@ -1,6 +1,7 @@
 import re
 import random
 import sys
+import time
 
 import pandas as pd
 import numpy as np
@@ -37,10 +38,11 @@ class DialogSMLogic:
     :param random_suggestion: hyperparameter how often restaurant suggestion should be made without information
         about all fields
     :param max_distance: hyperparameter what is maximum Lavenshtein distance to approve typo in word
+    :param delay: delay before system response (s)
 
     """
     def __init__(self, possible_choices: Dict[str, List[str]], model: Model, vectorizer: CountVectorizer,
-                 restaurants: pd.DataFrame, random_suggestion: float = 0.2, max_distance: int = 1) -> None:
+                 restaurants: pd.DataFrame, random_suggestion: float = 0.2, max_distance: int = 1, delay: int = 0) -> None:
         self.next_state: int = 0
         self.current_field: Tuple[str] = tuple()
         self.current_speech_act: str = 'info'
@@ -75,12 +77,14 @@ class DialogSMLogic:
         self.restaurants_base: pd.DataFrame = restaurants
         self.random_suggestion_th: float = random_suggestion
         self.max_distance: int = max_distance
+        self.delay: int = delay
 
     def state_transition(self, sentence: str):
         self.current_speech_act = self.__recognize_speech_act(sentence)
         if self.current_speech_act == 'bye':
             DialogSMLogic.__exit()
         self.transition_dict[self.next_state](sentence)
+        time.sleep(self.delay)
         DialogSMOutputs.get_dialog_option(self.next_state, self.dialog_args)
 
     def __state_0(self, sentence: str) -> None:

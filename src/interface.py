@@ -12,13 +12,14 @@ class Interface:
     """
     # TODO add docstring
     """
-    def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool, task: str) -> None:
+    def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool, task: str, delay: int) -> None:
         self.datapath: str = './data/' + datapath
         self.model_name: str = model
         self.drop_duplicates: bool = drop_duplicates
         self.bow_model = True if model in ('lr', 'fnn') else False
         self.eval: bool = evaluate
         self.task: str = task
+        self.delay: int = delay
 
     def run(self) -> None:
         self.__read_data()
@@ -115,7 +116,7 @@ class Interface:
         possible_choices = get_possible_choices('./data/restaurant_info.csv')
         possible_restaurants = get_possible_restaurants('./data/restaurant_info.csv')
 
-        sm = DialogSMLogic(possible_choices, self.__model, self.vectorizer, possible_restaurants)
+        sm = DialogSMLogic(possible_choices, self.__model, self.vectorizer, possible_restaurants, delay=self.delay)
         while True:
             sentence = input()
             print('')

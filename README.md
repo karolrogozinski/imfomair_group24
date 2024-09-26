@@ -65,6 +65,8 @@ parser.add_argument('-m', '--model', dest='model_name', default='fnn',
                             brb: BaselineRuleBased
                             lr: LogisticRegressio
                             fnn: FeedForwardNeuralNetwork""")
+parser.add_argument('-rd', '--response_delay', dest='response_delay', default=0, type=int,
+                        help='Add delay before system responses in (s)')
 parser.add_argument('-dd', '--drop_duplicates', dest='drop_duplicates', action='store_true',
                     help='Drop duplicate entries from data')
 parser.add_argument('-e', '--evaluate', dest='evaluate',action='store_true',

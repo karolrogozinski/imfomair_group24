@@ -4,7 +4,9 @@ from os.path import abspath, dirname
 
 from src.interface import Interface
 
+
 if __name__ == '__main__':
+
     os.chdir(dirname(abspath(__file__)))
     parser = argparse.ArgumentParser()
 
@@ -19,6 +21,8 @@ if __name__ == '__main__':
                                 brb: BaselineRuleBased
                                 lr: LogisticRegressio
                                 fnn: FeedForwardNeuralNetwork""")
+    parser.add_argument('-rd', '--response_delay', dest='response_delay', default=0, type=int,
+                        help='Add delay before system responses in (s)')
     parser.add_argument('-dd', '--drop_duplicates', dest='drop_duplicates', action='store_true',
                         help='Drop duplicate entries from data')
     parser.add_argument('-e', '--evaluate', dest='evaluate',action='store_true',
@@ -29,5 +33,5 @@ if __name__ == '__main__':
     args.drop_duplicates = True if args.drop_duplicates == 'True' else False
 
     interface = Interface(datapath=args.datapath, model=args.model_name, drop_duplicates=args.drop_duplicates,
-                          evaluate=args.evaluate, task=args.task)
+                          evaluate=args.evaluate, task=args.task, delay=args.response_delay)
     interface.run()
