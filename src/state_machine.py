@@ -207,6 +207,9 @@ class DialogSMLogic:
             info_exists = True
             if current_word not in self.preferences[field]:
                 self.preferences[field].append(current_word)
+                if current_word in self.antipathies[field]:
+                    self.antipathies[field].remove(current_word)
+
         return info_exists
 
     def __update_dislikes(self, negations: List[str], field: str, max_distance: int) -> None:
@@ -220,7 +223,8 @@ class DialogSMLogic:
 
         if current_word:
             self.antipathies[field].append(current_word)
-            self.preferences[field].remove(current_word)
+            if current_word in self.preferences[field]:
+                self.preferences[field].remove(current_word)
 
     def __get_unknown_fields(self) -> List[str]:
         """Returns a list of fields for which the user has not specified a preference.
