@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, f1_score, precision_score, recall_score
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -24,12 +24,16 @@ class ClassifierEvaluation:
 
     def accuracy(self) -> None:
         """Prints the accuracy score of the model."""
-        print(f'Accuracy: {accuracy_score(self.y_true, self.y_pred)}')
+        self.accuracy = accuracy_score(self.y_true, self.y_pred)
+        print(f'Accuracy: {self.accuracy}')
 
     def precision_recall_f1(self) -> None:
         """Prints the precision, recall, and F1-score for the model."""
         print("Classification Report:")
-        print(classification_report(self.y_true, self.y_pred, zero_division=1))
+        self.prec_recall_f1 = classification_report(self.y_true, self.y_pred, zero_division=1)
+        self.prec = precision_score(self.y_true, self.y_pred, average="macro", zero_division=1)
+        self.recall = recall_score(self.y_true, self.y_pred, average="macro", zero_division=1)
+        self.f1_score = f1_score(self.y_true, self.y_pred, average="macro", zero_division=1)
 
     def save_confusion_matrix(self) -> None:
         """Creates and saves the confusion matrix as a PNG file."""

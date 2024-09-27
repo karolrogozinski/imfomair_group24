@@ -23,11 +23,16 @@ if __name__ == '__main__':
                         help='Drop duplicate entries from data')
     parser.add_argument('-e', '--evaluate', dest='evaluate',action='store_true',
                         help='Make evaluation and save it to file')
+    parser.add_argument('-ht', '--hyper_param_tuning', dest='hyper_param_tuning', action='store_true')
 
     args = parser.parse_args()
 
     args.drop_duplicates = True if args.drop_duplicates == 'True' else False
+    args.hyper_param_tuning = True if args.hyper_param_tuning == 'True' else False
+
+    #args.hyper_param_tuning = True
+    #args.drop_duplicates = True
 
     interface = Interface(datapath=args.datapath, model=args.model_name, drop_duplicates=args.drop_duplicates,
-                          evaluate=args.evaluate, task=args.task)
+                          evaluate=args.evaluate, task=args.task, hyper_param_tuning=args.hyper_param_tuning)
     interface.run()

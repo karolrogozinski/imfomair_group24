@@ -2,6 +2,7 @@ import sys
 from datetime import datetime
 
 import pandas as pd
+import numpy as np
 
 from src.utils import prepare_data, get_possible_choices, get_possible_restaurants
 from src.models import BaselineMajor, BaselineRuleBased, LogisticRegressorModel, FeedForwardNN
@@ -12,28 +13,35 @@ class Interface:
     """
     # TODO add docstring
     """
-    def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool, task: str) -> None:
+    def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool, task: str, hyper_param_tuning: bool) -> None:
         self.datapath: str = './data/' + datapath
         self.model_name: str = model
         self.drop_duplicates: bool = drop_duplicates
         self.bow_model = True if model in ('lr', 'fnn') else False
         self.eval: bool = evaluate
         self.task: str = task
+        self.hyper_param_tuning: bool = hyper_param_tuning
 
     def run(self) -> None:
         self.__read_data()
         self.__read_model()
-        self.__train_model()
-        if self.eval:
-            self.__predict()
-            self.__evaluate()
-        if self.task == '1A':
-            Interface.__welcome()
-            self.__manual_prediction()
-        elif self.task == '1B':
-            self.__simple_dialog()
+        
+        
+        # if we are going to perform hyper param tuning or the regular execution pattern
+        if self.hyper_param_tuning:
+            self.__hyper_param_tuning()
         else:
-            pass # TODO part 1C
+            self.__train_model()
+            if self.eval:
+                self.__predict()
+                self.__evaluate()
+            if self.task == '1A':
+                Interface.__welcome()
+                self.__manual_prediction()
+            elif self.task == '1B':
+                self.__simple_dialog()
+            else:
+                pass # TODO part 1C
 
     @staticmethod
     def __welcome() -> None:
@@ -63,6 +71,66 @@ class Interface:
         else:
             print('Model not found!')
             sys.exit(2)
+
+    def __hyper_param_tuning(self) -> None:
+        print('Hyper parameters are on trial. (this will take quiet a while.)')
+
+        # Parameters: activation="relu", solver="adam", batch_size=200, alpha=0.001, max_iter=200, hidden_layer_size
+        # We are going to iterate these values and collect relevant scores: accuracy, recall, precision, f1
+        activation_list = ["logistic", "tanh", "relu"]
+        solver_list = ["lbfgs", "sgd", "adam"]
+        batch_size_list = [200, 400, 1000]
+        alpha_list = [10**(-5), 10**(-4), 10**(-3)]
+        max_iter_list = [200, 500, 1000]
+        hidden_layer_size_list = [10, 100, 250]
+
+        # Dataframe that holds the results
+        results_df = pd.DataFrame(columns=['Activation', 'Solver', 'Batch Size', 'Alpha', 'Max Iter', 'Hidden Layer Size', 'Accuracy', 'Precision', 'Recall', 'F1'])
+
+        train_count = 0
+        total_training_needed = len(activation_list) * len(solver_list) * len(batch_size_list) * len(alpha_list) * len(max_iter_list)
+
+        for activation in activation_list:
+            for solver in solver_list:
+                for batch_size in batch_size_list:
+                    for alpha in alpha_list:
+                        for max_iter in max_iter_list:
+                            for hidden_layer_size in hidden_layer_size_list:
+                                # Work the model
+                                self.__model.fit(X_train=self.__X_train, y_train=self.__y_train, activation=activation, solver=solver, batch_size=batch_size, alpha=alpha, max_iter=max_iter, hidden_layer_sizes=hidden_layer_size)
+                                self.__y_pred = self.__model.predict(self.__X_test)
+
+                                # Evaluate the model
+                                evaluation = ClassifierEvaluation(y_pred=self.__y_pred, y_true=self.__y_test)
+                                evaluation.accuracy()
+                                evaluation.precision_recall_f1()
+
+                                train_count += 1
+                                print(f"Training_count: {train_count} / {total_training_needed}")
+
+                                # Collect the scores
+                                # Create a new row as a DataFrame
+                                new_row = pd.DataFrame({
+                                    'Activation': [activation],
+                                    'Solver': [solver],
+                                    'Batch Size': [batch_size],
+                                    'Alpha': [alpha],
+                                    'Max Iter': [max_iter],
+                                    'Hidden Layer Size': [hidden_layer_size],
+                                    'Accuracy': [evaluation.accuracy],
+                                    'Precision': [evaluation.prec],
+                                    'Recall': [evaluation.recall],
+                                    'F1': [evaluation.f1_score]
+                                })
+
+                                # Concatenate the new row with the results DataFrame
+                                results_df = pd.concat([results_df, new_row], ignore_index=True)
+        
+        # Put the results into an Excel file
+        results_df.to_excel("./reports/eval/model_training_results.xlsx", index=False)
+
+
+
 
     def __train_model(self) -> None:
         print('Training model... (it may take a while)')

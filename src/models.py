@@ -126,10 +126,10 @@ class LogisticRegressorModel(Model):
 
 class FeedForwardNN(Model):
 
-    def fit(self, X_train: list, y_train: list) -> None:
+    def fit(self, X_train: list, y_train: list, activation="relu", solver="adam", batch_size=200, alpha=0.0001, max_iter=200, hidden_layer_sizes=100) -> None:
         # Train the fnn model. Do we need to make hyperparameter tuning?
             # The project description does not ask us to divide development data for such hyper parameter tuning.
-        self.fnn_model = MLPClassifier(random_state=42, max_iter=300, solver="adam").fit(X_train, y_train)
+        self.fnn_model = MLPClassifier(random_state=42, max_iter=max_iter, solver=solver, activation=activation, batch_size=batch_size, alpha=alpha, hidden_layer_sizes=hidden_layer_sizes).fit(X_train, y_train)
 
     def predict(self, X_test):
         # Make predictions and return as pandas series.
