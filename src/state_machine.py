@@ -218,7 +218,7 @@ class DialogSMLogic:
         if current_word:
             info_exists = True
             if current_word not in self.preferences[field]:
-                self.preferences[field].append(current_word)
+                self.preferences[field] = [current_word]
                 if current_word in self.antipathies[field]:
                     self.antipathies[field].remove(current_word)
 
