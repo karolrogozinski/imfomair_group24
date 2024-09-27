@@ -80,6 +80,7 @@ class DialogSMLogic:
             4: self.__state_4,
             5: self.__state_5,
             6: self.__state_6,
+            7: self.__state_7,
         }
 
         self.possible_choices: dict = possible_choices
@@ -163,9 +164,7 @@ class DialogSMLogic:
                 self.next_state = 4
             self.transition_dict[self.next_state](sentence)
         elif self.current_speech_act in ('negate', 'inform'):
-            self.suggested_restaurants = pd.DataFrame()
-            self.current_restaurant = pd.DataFrame()
-            self.next_state = 1
+            self.next_state = 7
             self.transition_dict[self.next_state](sentence)
         elif self.current_speech_act in ('request', 'confirm'):
             self.__parse_request(sentence)
@@ -173,6 +172,12 @@ class DialogSMLogic:
 
     def __state_6(self, sentence: str) -> None:
         self.next_state = 5
+        self.transition_dict[self.next_state](sentence)
+
+    def __state_7(self, sentence: str) -> None:
+        self.suggested_restaurants = pd.DataFrame()
+        self.current_restaurant = pd.DataFrame()
+        self.next_state = 1
         self.transition_dict[self.next_state](sentence)
 
     def __recognize_speech_act(self, sentence: str) -> str:
@@ -460,6 +465,10 @@ Please provide {text} again.""".replace(
             text += 'To contact them you can call ' + phone + '.'
 
         return text or 'Sorry I do not understand your request.'
+
+    @staticmethod
+    def __state_7(options: Tuple) -> None:
+        pass
 
     @staticmethod
     def __exit(_: Tuple) -> str:
