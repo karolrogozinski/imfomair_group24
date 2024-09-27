@@ -11,6 +11,7 @@ from typing import Dict, List, Tuple
 from sklearn.feature_extraction.text import CountVectorizer
 
 import textdistance
+import pyttsx3
 
 from src.models import Model
 
@@ -52,14 +53,13 @@ class DialogSMLogic:
 
     """
     def __init__(self, possible_choices: Dict[str, List[str]], model: Model, vectorizer: CountVectorizer,
-                 restaurants: pd.DataFrame, random_suggestion: float = 0.2, max_distance: int = 1, delay: int = 0) -> None:
+                 restaurants: pd.DataFrame, random_suggestion: float = 0.2, max_distance: int = 1, delay: int = 0,
+                 tts: bool = False) -> None:
         self.next_state: int = 0
         self.current_field: Tuple[str] = tuple()
         self.current_speech_act: str = 'info'
         self.dialog_args: Tuple = tuple()
         self.current_restaurant: pd.DataFrame = pd.DataFrame()
-
-        DialogSMOutputs.get_dialog_option(self.next_state, self.dialog_args)
 
         self.preferences: dict = {
             'food': [],
@@ -88,14 +88,17 @@ class DialogSMLogic:
         self.random_suggestion_th: float = random_suggestion
         self.max_distance: int = max_distance
         self.delay: int = delay
+        self.dialog_machine: DialogSMOutputs = DialogSMOutputs(tts=tts)
+
+        self.dialog_machine.get_dialog_option(self.next_state, self.dialog_args)
 
     def state_transition(self, sentence: str):
         self.current_speech_act = self.__recognize_speech_act(sentence)
         if self.current_speech_act == 'bye':
-            DialogSMLogic.__exit()
+            self.__exit()
         self.transition_dict[self.next_state](sentence)
         time.sleep(self.delay)
-        DialogSMOutputs.get_dialog_option(self.next_state, self.dialog_args)
+        self.dialog_machine.get_dialog_option(self.next_state, self.dialog_args)
 
     def __state_0(self, sentence: str) -> None:
         self.next_state = 1
@@ -301,11 +304,10 @@ class DialogSMLogic:
 
         self.dialog_args = dialog_args
 
-    @staticmethod
-    def __exit() -> None:
+    def __exit(self) -> None:
         """ Close the program
         """
-        DialogSMOutputs.get_dialog_option(-1, [])
+        self.dialog_machine.get_dialog_option(-1, ())
         sys.exit()
 
 
@@ -315,11 +317,12 @@ class DialogSMOutputs:
         Dialog options outputs when entering the state - BEFORE applying state logic.
         Each of them takes dialog options as input to parametrize sentences.
     """
-    def __init__(self) -> None:
-        pass
+    def __init__(self, tts: bool = False) -> None:
+        self.tts = tts
+        if tts:
+            self.tts_engine = pyttsx3.init()
 
-    @staticmethod
-    def get_dialog_option(state_number: int, options: Tuple = ()) -> None:
+    def get_dialog_option(self, state_number: int, options: Tuple = ()) -> None:
         transition_dict = {
             0: DialogSMOutputs.__state_0,
             1: DialogSMOutputs.__state_1,
@@ -330,13 +333,18 @@ class DialogSMOutputs:
             6: DialogSMOutputs.__state_6,
             -1: DialogSMOutputs.__exit,
         }
-        return transition_dict[state_number](options)
+        text = transition_dict[state_number](options)
+        print('ASSISTANT: ', text)
+        if self.tts:
+            self.tts_engine.say(text)
+            self.tts_engine.runAndWait()
 
     @staticmethod
-    def __state_0(_: Tuple) -> None:
-        print("""Hello, welcome to the Cambridge Restaurant System!
+    def __state_0(_: Tuple) -> str:
+        text = """Hello, welcome to the Cambridge Restaurant System!
 You can search for restaurants by area, price range or cuisine.
-How can I help you?""")
+How can I help you?"""
+        return text
 
     @staticmethod
     def __state_1(_: Tuple) -> None:

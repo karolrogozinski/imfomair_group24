@@ -10,7 +10,7 @@ if __name__ == '__main__':
     os.chdir(dirname(abspath(__file__)))
     parser = argparse.ArgumentParser()
 
-    # -f FILENAME -m MODEL -dd DROP_DUPLICATES -e EVALUATE
+    # -f FILENAME -m MODEL -rd RESPONSE_DELAY -dd DROP_DUPLICATES -e EVALUATE -tts TEXT_TO_SPEECH
     parser.add_argument('-f', '--filename', dest='datapath',
                         default='dialog_acts.dat', help='File in data folder in .dat format')
     parser.add_argument('-t', '--task', dest='task',
@@ -27,11 +27,11 @@ if __name__ == '__main__':
                         help='Drop duplicate entries from data')
     parser.add_argument('-e', '--evaluate', dest='evaluate',action='store_true',
                         help='Make evaluation and save it to file')
+    parser.add_argument('-tts', '--text_to_speech', dest='tts',action='store_true',
+                        help='Use text-to-speech for system utterances')
 
     args = parser.parse_args()
 
-    args.drop_duplicates = True if args.drop_duplicates == 'True' else False
-
     interface = Interface(datapath=args.datapath, model=args.model_name, drop_duplicates=args.drop_duplicates,
-                          evaluate=args.evaluate, task=args.task, delay=args.response_delay)
+                          evaluate=args.evaluate, task=args.task, delay=args.response_delay, tts=args.tts)
     interface.run()
