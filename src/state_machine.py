@@ -19,8 +19,8 @@ from src.models import Model
 DONTCARE_WORDS = ['any', 'dontcare', 'doesnt matter', "don't care", "doesn't matter", 'whatever']
 REQUEST_WORDS = {
     'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree'],
-    'address': ['place', 'where', 'area', 'address', 'postcode', 'addr', 'location', 'street', 'city',
-                'zipcode'],
+    'address': ['place', 'where', 'area', 'address', 'addr', 'location', 'street', 'city',],
+    'postcode': ['zipcode', 'postcode', 'code'],
     'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
     'pricerange': ['price', 'price range', 'cost', 'cheap', 'expensive'],
 }
@@ -297,10 +297,10 @@ class DialogSMLogic:
         """
         dialog_args = list()
         dialog_args.append(self.current_restaurant.restaurantname.iloc[0])
-        for field in ('food', 'phone', 'pricerange'):
+        for field in ('food', 'phone', 'pricerange', 'postcode'):
             dialog_args.append(self.current_restaurant[field].iloc[0] if field in requests else '')
         dialog_args.append([self.current_restaurant.area.iloc[0], self.current_restaurant.addr.iloc[0],
-                            self.current_restaurant.postcode.iloc[0]] if 'address' in requests else [])
+                            ] if 'address' in requests else [])
 
         self.dialog_args = dialog_args
 
@@ -414,10 +414,11 @@ Do you have any other preferences or this suggestion satisfies you and want to h
         food = options[1]
         phone = options[2]
         price_range = options[3]
+        zipcode = options[4]
 
         text = ''
 
-        if food or price_range or options[4]:
+        if food or price_range or options[5]:
             text += name.title() + ' is '
 
             if food and price_range:
@@ -427,13 +428,15 @@ Do you have any other preferences or this suggestion satisfies you and want to h
             else:
                 text += price_range + ' restaurant'
 
-            if options[4]:
-                area = options[4][0]
-                address = options[4][1]
-                zipcode = options[4][2]
-                text += ' located in the ' + area + 'part of the town at ' + address + ', ' + zipcode
+            if options[5]:
+                area = options[5][0]
+                address = options[5][1]
+                text += ' located in the ' + area + 'part of the town at ' + address
 
             text += '. '
+
+        if zipcode:
+            text += 'The zipcode is ' + zipcode + '.'
 
         if phone:
             text += 'To contact them you can call ' + phone + '.'
