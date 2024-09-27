@@ -42,6 +42,8 @@ The project was developed and test with ```python 3.9.12``` and libraries from [
 - textdistance=4.2.1
 ```
 
+For the ASR functionality internet connection is also required.
+
 ## Run
 The easier way to run program is to run from main directory:
 
