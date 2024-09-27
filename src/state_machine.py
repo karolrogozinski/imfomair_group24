@@ -60,6 +60,7 @@ class DialogSMLogic:
         self.current_speech_act: str = 'info'
         self.dialog_args: Tuple = tuple()
         self.current_restaurant: pd.DataFrame = pd.DataFrame()
+        self.suggested_restaurants: pd.DataFrame = pd.DataFrame()
 
         self.preferences: dict = {
             'food': [],
@@ -136,18 +137,21 @@ class DialogSMLogic:
             self.transition_dict[self.next_state](sentence)
 
     def __state_4(self, sentence: str) -> None:
-        self.__find_restaurant()
+        found_new_restaurant = self.__find_restaurant()
 
         if self.current_restaurant.empty:
             self.next_state = 3
             self.dialog_args = tuple([])
+
         else:
             self.next_state = 5
             tmp_options = [self.current_restaurant.restaurantname.iloc[0]]
-            for key in self.preferences.keys():
-                info = self.current_restaurant[key] if self.current_restaurant[key].iloc[0] in self.preferences[key] \
-                    else pd.Series([''])
-                tmp_options.append(info.iloc[0])
+
+            if found_new_restaurant:
+                for key in self.preferences.keys():
+                    info = self.current_restaurant[key] if self.current_restaurant[key].iloc[0] in self.preferences[key] \
+                        else pd.Series([''])
+                    tmp_options.append(info.iloc[0])
 
             self.dialog_args = tuple(tmp_options)
 
@@ -159,6 +163,8 @@ class DialogSMLogic:
                 self.next_state = 4
             self.transition_dict[self.next_state](sentence)
         elif self.current_speech_act in ('negate', 'inform'):
+            self.suggested_restaurants = pd.DataFrame()
+            self.current_restaurant = pd.DataFrame()
             self.next_state = 1
             self.transition_dict[self.next_state](sentence)
         elif self.current_speech_act in ('request', 'confirm'):
@@ -245,12 +251,13 @@ class DialogSMLogic:
                           if len(preferences) == 0]
         return unknown_fields
 
-    def __find_restaurant(self) -> None:
+    def __find_restaurant(self) -> bool:
         """ Finds a restaurant based on user likes and dislikes.
             In case of many possibilities, randomly chooses one of them, trying to avoid the previously chosen one.
         """
         possible_flag = 0
         possible_restaurants = pd.DataFrame()
+        found_new_restaurant = False
 
         for key in self.preferences.keys():
             if len(self.preferences[key]) > 0:
@@ -268,14 +275,21 @@ class DialogSMLogic:
                 possible_restaurants = self.restaurants_base[~self.restaurants_base[key].isin(self.antipathies[key])]
                 possible_flag = 1
 
-        if not possible_restaurants.empty and not self.current_restaurant.empty:
-            current_name = self.current_restaurant.restaurantname.iloc[0]
+        if not possible_restaurants.empty and not self.suggested_restaurants.empty:
             possible_restaurants = possible_restaurants[
-                possible_restaurants.restaurantname != current_name]
+                ~possible_restaurants.restaurantname.isin(self.suggested_restaurants.restaurantname)]
         if not possible_restaurants.empty:
             self.current_restaurant = possible_restaurants.sample()
-        else:
-            self.current_restaurant = pd.DataFrame()
+            if self.suggested_restaurants.empty:
+                self.suggested_restaurants = self.current_restaurant
+            else:
+                self.suggested_restaurants = pd.concat([self.suggested_restaurants, self.current_restaurant],
+                                                       ignore_index=True)
+            found_new_restaurant = True
+        # else:
+        #     self.current_restaurant = pd.DataFrame()
+
+        return found_new_restaurant
 
     def __parse_request(self, sentence: str) -> None:
         """ Parses the record for types of requested fields.
@@ -367,11 +381,12 @@ Please provide {text} again.""".replace(
 
     @staticmethod
     def __state_3(options: Tuple) -> str:
-        if not options:
-            text = ''
-        else:
-            text = ' ' + options[0]
-        text = f"""I am not sure about the results. Could you provide another{text} preference?""".replace(
+        pref = ''
+        text = 'I am not sure about the results.'
+        if len(options) == 1:
+            pref = options[0] + ' '
+
+        text += f""" Could you provide another {pref}preference?""".replace(
             'food', 'cuisine type').replace('_', ' ')
         return text
 
@@ -381,31 +396,34 @@ Please provide {text} again.""".replace(
 
     @staticmethod
     def __state_5(options: Tuple) -> str:
-        if len(options) == 5:
+        if len(options) == 1:
+            text = f'There are no more options, so as the last one was {options[0]}. \n'
+        elif len(options) == 5:
             text = 'Do you have any more questions or comments about suggested restaurant?'
-            return text
-
-        name = options[0]
-        food = options[1]
-        area = options[2]
-        price_range = options[3]
-
-        text = 'It is '
-        if food and area and price_range:
-            text += f'{price_range}, {food} restaurant in the {area} part of the town.'
-        elif food and area:
-            text += f'{food} restaurant in the {area} part of town.'
-        elif area and price_range:
-            text += f'{price_range} restaurant in the {area} part of the town.'
-        elif food and price_range:
-            text += f'{price_range}, {food} restaurant.'
-        elif food or price_range:
-            text += f'{price_range + food} restaurant.'
         else:
-            text += f'restaurant in the {area} part of the town.'
+            name = options[0]
+            food = options[1]
+            area = options[2]
+            price_range = options[3]
 
-        text = f"""My suggestion is {name}. \n{text}
-Do you have any other preferences or this suggestion satisfies you and want to hear more details?"""
+            text = 'It is '
+            if food and area and price_range:
+                text += f'{price_range}, {food} restaurant in the {area} part of the town.'
+            elif food and area:
+                text += f'{food} restaurant in the {area} part of town.'
+            elif area and price_range:
+                text += f'{price_range} restaurant in the {area} part of the town.'
+            elif food and price_range:
+                text += f'{price_range}, {food} restaurant.'
+            elif food or price_range:
+                text += f'{price_range + food} restaurant.'
+            else:
+                text += f'restaurant in the {area} part of the town.'
+
+            text = f'My suggestion is {name}. \n{text}'
+
+        if len(options) != 5:
+            text += ' Do you have any other preferences or this suggestion satisfies you and want to hear more details?'
         return text
 
     @staticmethod
