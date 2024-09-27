@@ -4,6 +4,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 
+import speech_recognition as sr
+import sounddevice as sd
+
 from typing import Dict, List
 
 
@@ -71,3 +74,19 @@ def get_possible_choices(path: str) -> Dict[str, List]:
     }
 
     return choices
+
+
+def automatic_speech_recognition(samplerate: int = 16000, duration: int = 5):
+    recognizer = sr.Recognizer()
+    input("Press Enter to start recording...")
+
+    print("Recording...")
+    audio_data = sd.rec(int(samplerate * duration), samplerate=samplerate, channels=1, dtype=np.int16)
+    sd.wait()
+
+    audio = sr.AudioData(audio_data.tobytes(), samplerate, 2)
+    try:
+        text = recognizer.recognize_google(audio, language="en-US")
+        return text
+    except sr.UnknownValueError:
+        print('Error while recognizing audio. Please try again.')

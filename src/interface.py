@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from src.utils import prepare_data, get_possible_choices, get_possible_restaurants
+from src.utils import prepare_data, get_possible_choices, get_possible_restaurants, automatic_speech_recognition
 from src.models import BaselineMajor, BaselineRuleBased, LogisticRegressorModel, FeedForwardNN
 from src.evaluations import ClassifierEvaluation
 from src.state_machine import DialogSMLogic
@@ -13,7 +13,7 @@ class Interface:
     # TODO add docstring
     """
     def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool,
-                 task: str, delay: int, tts: bool) -> None:
+                 task: str, delay: int, tts: bool, asr: bool) -> None:
         self.datapath: str = './data/' + datapath
         self.model_name: str = model
         self.drop_duplicates: bool = drop_duplicates
@@ -22,6 +22,7 @@ class Interface:
         self.task: str = task
         self.delay: int = delay
         self.tts: bool = tts
+        self.asr: bool = asr
 
     def run(self) -> None:
         self.__read_data()
@@ -121,6 +122,12 @@ class Interface:
         sm = DialogSMLogic(possible_choices, self.__model, self.vectorizer, possible_restaurants, delay=self.delay,
                            tts=self.tts)
         while True:
-            sentence = input('USER: ')
+            if self.asr:
+                sentence = automatic_speech_recognition()
+                print('USER:', sentence)
+            else:
+                sentence = input('USER: ')
+
             print('')
-            sm.state_transition(sentence)
+            if sentence:
+                sm.state_transition(sentence)
