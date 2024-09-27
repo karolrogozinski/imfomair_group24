@@ -351,7 +351,7 @@ How can I help you?"""
         pass
 
     @staticmethod
-    def __state_2(options: Tuple) -> None:
+    def __state_2(options: Tuple) -> str:
         if len(options) == 0:
             text = 'any preferences'
         elif len(options) == 1:
@@ -360,28 +360,30 @@ How can I help you?"""
             text = options[0] + ' and ' + options[1]
         else:
             text = options[0] + ', ' + options[1] + ' and ' + options[2]
-        print(f"""There is no restaurant with given parameters.
+        text = f"""There is no restaurant with given parameters.
 Please provide {text} again.""".replace(
-            'food', 'cuisine type').replace('pricerange', 'price range'))
+            'food', 'cuisine type').replace('pricerange', 'price range')
+        return text
 
     @staticmethod
-    def __state_3(options: Tuple):
+    def __state_3(options: Tuple) -> str:
         if not options:
             text = ''
         else:
-            text = ' ' + options[0] + ' '
-        print(f"""I am not sure about the results. Could you provide another{text}preference?""".replace(
-            'food', 'cuisine type').replace('_', ' '))
+            text = ' ' + options[0]
+        text = f"""I am not sure about the results. Could you provide another{text} preference?""".replace(
+            'food', 'cuisine type').replace('_', ' ')
+        return text
 
     @staticmethod
     def __state_4(_: Tuple) -> None:
         pass
 
     @staticmethod
-    def __state_5(options: Tuple) -> None:
+    def __state_5(options: Tuple) -> str:
         if len(options) == 5:
-            print('Do you have any more questions or comments about suggested restaurant?')
-            return
+            text = 'Do you have any more questions or comments about suggested restaurant?'
+            return text
 
         name = options[0]
         food = options[1]
@@ -402,11 +404,12 @@ Please provide {text} again.""".replace(
         else:
             text += f'restaurant in the {area} part of the town.'
 
-        print(f"""My suggestion is {name}. \n{text}
-Do you have any other preferences or this suggestion satisfies you and want to hear more details?""")
+        text = f"""My suggestion is {name}. \n{text}
+Do you have any other preferences or this suggestion satisfies you and want to hear more details?"""
+        return text
 
     @staticmethod
-    def __state_6(options: Tuple) -> None:
+    def __state_6(options: Tuple) -> str:
         name = options[0]
         food = options[1]
         phone = options[2]
@@ -435,9 +438,8 @@ Do you have any other preferences or this suggestion satisfies you and want to h
         if phone:
             text += 'To contact them you can call ' + phone + '.'
 
-        print(text or 'Sorry I do not understand your request.')
+        return text or 'Sorry I do not understand your request.'
 
     @staticmethod
-    def __exit(_: Tuple) -> None:
-        print('Thank you for using Cambridge Restaurant System. Bye!')
-        sys.exit()
+    def __exit(_: Tuple) -> str:
+        return 'Thank you for using Cambridge Restaurant System. Bye!'
