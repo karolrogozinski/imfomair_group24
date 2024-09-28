@@ -4,11 +4,13 @@ from os.path import abspath, dirname
 
 from src.interface import Interface
 
+
 if __name__ == '__main__':
+
     os.chdir(dirname(abspath(__file__)))
     parser = argparse.ArgumentParser()
 
-    # -f FILENAME -m MODEL -dd DROP_DUPLICATES -e EVALUATE
+    # -f FILENAME -m MODEL -rd RESPONSE_DELAY -dd DROP_DUPLICATES -e EVALUATE -tts TEXT_TO_SPEECH -asr AUTOMATIC_SPEECH_RECOGNITION
     parser.add_argument('-f', '--filename', dest='datapath',
                         default='dialog_acts.dat', help='File in data folder in .dat format')
     parser.add_argument('-t', '--task', dest='task',
@@ -19,6 +21,8 @@ if __name__ == '__main__':
                                 brb: BaselineRuleBased
                                 lr: LogisticRegressio
                                 fnn: FeedForwardNeuralNetwork""")
+    parser.add_argument('-rd', '--response_delay', dest='response_delay', default=0, type=int,
+                        help='Add delay before system responses in (s)')
     parser.add_argument('-dd', '--drop_duplicates', dest='drop_duplicates', action='store_true',
                         help='Drop duplicate entries from data')
     parser.add_argument('-e', '--evaluate', dest='evaluate',action='store_true',
