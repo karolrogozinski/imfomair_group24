@@ -23,10 +23,21 @@ REQUEST_WORDS = {
     'postcode': ['zipcode', 'postcode', 'code'],
     'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
     'pricerange': ['price', 'price range', 'cost', 'cheap', 'expensive'],
-    'food_quality': ['decent', 'fast food', 'good food', 'fast', 'good', 'decent'],
-    'crowdedness': ['busy', 'quiet'],
-    'length_of_stay': ['long', 'medium', 'short']
+    # 'food_quality': ['decent', 'fast food', 'good food', 'fast', 'good', 'decent'],
+    # 'crowdedness': ['busy', 'quiet'],
+    # 'length_of_stay': ['long', 'medium', 'short']
 }
+POSSIBLE_SECONDARY_PREF_WORDS = {
+    'touristic': ['touristic'] ,
+    'seats': ['assigned', 'seats'],
+    'children': ['child', 'children', 'kid'],
+    'romantic': ['romantic', 'anniversary', 'wife', 'husband', 'romance']
+}
+
+global FIRST_TIME_8
+FIRST_TIME_8 = True
+global PREV_STATE
+PREV_STATE = None
 
 
 class DialogSMLogic:
@@ -76,14 +87,16 @@ class DialogSMLogic:
             'pricerange': [],
         }
         self.secondary_preferences: dict = {
-            'food_quality': [],
-            'crowdedness': [],
-            'length_of_stay': [],
+            'touristic': [],
+            'seats': [],
+            'children': [],
+            'romantic': []
         }
         self.secondary_antipathies: dict = {
-            'food_quality': [],
-            'crowdedness': [],
-            'length_of_stay': [],
+            'touristic': [],
+            'seats': [],
+            'children': [],
+            'romantic': []
         }
         self.transition_dict = {
             0: self.__state_0,
@@ -119,10 +132,14 @@ class DialogSMLogic:
 
     def __state_0(self, sentence: str) -> None:
         self.next_state = 1
+        global PREV_STATE 
+        PREV_STATE = 0
         self.transition_dict[self.next_state](sentence)
 
     def __state_1(self, sentence: str) -> None:
         info_exists = self.__update_all_preferences(sentence)
+        global PREV_STATE 
+        PREV_STATE = 1
         unknown_fields = self.__get_unknown_fields()
 
         if info_exists:
@@ -145,6 +162,8 @@ class DialogSMLogic:
         if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
             self.next_state = 1
             self.transition_dict[self.next_state](sentence)
+        global PREV_STATE 
+        PREV_STATE = 2
 
     def __state_3(self, sentence: str) -> None:
         if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
@@ -152,9 +171,15 @@ class DialogSMLogic:
             self.next_state = 1
             self.transition_dict[self.next_state](sentence)
 
+        global FIRST_TIME_8
+        FIRST_TIME_8 = True
+        global PREV_STATE 
+        PREV_STATE = 3
+
     def __state_4(self, sentence: str) -> None:
         found_new_restaurant = self.__find_restaurant()
-
+        global PREV_STATE 
+        PREV_STATE = 4
         # if there no restaurant matching the initial preferences, go to state 3
         if self.current_restaurant.empty:
             self.next_state = 3
@@ -187,24 +212,112 @@ class DialogSMLogic:
             self.__parse_request(sentence)
             self.next_state = 6
 
+        global PREV_STATE 
+        PREV_STATE = 5
+
     def __state_6(self, sentence: str) -> None:
         self.next_state = 5
+        global PREV_STATE 
+        PREV_STATE = 6
         self.transition_dict[self.next_state](sentence)
 
     def __state_7(self, sentence: str) -> None:
         self.suggested_restaurants = pd.DataFrame()
         self.current_restaurant = pd.DataFrame()
         self.next_state = 1
+        global PREV_STATE 
+        PREV_STATE = 7
         self.transition_dict[self.next_state](sentence)
 
     def __state_8(self, sentence: str) -> None:
-        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
+        # TODO: what to do with null here?
+        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'null', 'negate'):
+
+            # consequents to work on
+            consequent_list = []
+            global FIRST_TIME_8
+
+            info_exists = self.__update_all_preferences(sentence, from_8=True)
             
             # I need to make the matching now.
-            info_exists = self.__update_all_preferences(sentence, from_8=True)
-            if info_exists:
-                pass
+            pref_exists = False
+            for pref in self.secondary_preferences.values():
+                if len(pref) > 0: #or FIRST_TIME_8:
+                    pref_exists = True
+                    break
+            if pref_exists:
+                # we do the rule matching
+                # first check for the field of POSSIBLE_SECONDARY_PREF_WORDS
+                
+                FIRST_TIME_8 = False
+                for field in POSSIBLE_SECONDARY_PREF_WORDS.keys():
+                    if len(self.secondary_preferences[field]) > 0:
+                        consequent_list.append(field)
 
+                # once we have the list we start matching rules for each of them.
+                # TODO: I could have done it in the for loop above too but gonna take a look at it if I have time.
+                
+                for index, restaurant in self.possible_restaurants.iterrows():
+                    for consequent in consequent_list:
+                        t_val = self.__try_all_rules(restaurant=restaurant, consequent=consequent)
+                        if not t_val:
+                            # if any of the rules evaluate to false for a restaurant, remove the restaurant from possible restaurants list.
+                            self.possible_restaurants = self.possible_restaurants[self.possible_restaurants['restaurantname'] != restaurant['restaurantname']]
+                
+                # sample a new current restaurant
+                if not self.possible_restaurants.empty and not self.suggested_restaurants.empty:
+                    self.possible_restaurants = self.possible_restaurants[
+                        ~self.possible_restaurants.restaurantname.isin(self.suggested_restaurants.restaurantname)]
+                if not self.possible_restaurants.empty:
+                    self.current_restaurant = self.possible_restaurants.sample()
+                    if self.suggested_restaurants.empty:
+                        self.suggested_restaurants = self.current_restaurant
+                        self.last_suggested_restaurant = self.current_restaurant
+                    else:
+                        self.suggested_restaurants = pd.concat([self.suggested_restaurants, self.current_restaurant],
+                                                            ignore_index=True)
+                        self.last_suggested_restaurant = self.current_restaurant
+                        
+
+                if self.current_restaurant.empty:
+                    self.next_state = 3
+                    self.dialog_args = tuple([])
+                else:
+                    self.next_state = 5
+                    tmp_options = [self.last_suggested_restaurant.restaurantname.iloc[0]]
+
+                    self.dialog_args = tuple(tmp_options)
+            else:
+                self.next_state = 5
+                tmp_options = [self.current_restaurant.restaurantname.iloc[0]]
+
+                for key in self.preferences.keys():
+                    info = self.current_restaurant[key] if self.current_restaurant[key].iloc[0] in self.preferences[key] \
+                            else pd.Series([''])
+                    tmp_options.append(info.iloc[0])
+
+                self.dialog_args = tuple(tmp_options)
+           
+        
+        # if user spesifically says no, continue with state 5:
+        """
+        if self.current_speech_act in ('negate'):
+            self.next_state = 5
+            tmp_options = [self.current_restaurant.restaurantname.iloc[0]]
+
+            for key in self.preferences.keys():
+                info = self.current_restaurant[key] if self.current_restaurant[key].iloc[0] in self.preferences[key] \
+                    else pd.Series([''])
+                tmp_options.append(info.iloc[0])
+
+            self.dialog_args = tuple(tmp_options)
+        global PREV_STATE 
+
+        PREV_STATE = 8
+        """
+
+
+    # TODO: delete state 9
     def __state_9(self, sentence: str) -> None:
         pass
 
@@ -255,11 +368,19 @@ class DialogSMLogic:
         current_word = None
         info_exists = False
 
-        for word in sentence.split():
-            for value in self.possible_choices[field]:
-                if textdistance.levenshtein(word, value) <= max_distance:
-                    current_word = value
-                    max_distance = textdistance.levenshtein(word, value)
+        if not from_8:
+            for word in sentence.split():
+                for value in self.possible_choices[field]:
+                    if textdistance.levenshtein(word, value) <= max_distance:
+                        current_word = value
+                        max_distance = textdistance.levenshtein(word, value)
+        else:
+            for word in sentence.split():
+                for value in POSSIBLE_SECONDARY_PREF_WORDS[field]:
+                    if textdistance.levenshtein(word, value) <= max_distance:
+                        current_word = value
+                        max_distance = textdistance.levenshtein(word, value)
+
 
         if current_word:
             info_exists = True
@@ -290,10 +411,10 @@ class DialogSMLogic:
                 self.antipathies[field].append(current_word)
                 if current_word in self.preferences[field]:
                     self.preferences[field].remove(current_word)
-            else:
-                self.secondary_antipathies[field].append(current_word)
-                if current_word in self.secondary_preferences[field]:
-                    self.secondary_preferences[field].remove(current_word)
+            #else:
+            #    self.secondary_antipathies[field].append(current_word)
+            #    if current_word in self.secondary_preferences[field]:
+            #        self.secondary_preferences[field].remove(current_word)
 
     def __get_unknown_fields(self) -> List[str]:
         """Returns a list of fields for which the user has not specified a preference.
@@ -304,6 +425,45 @@ class DialogSMLogic:
 
     def __match_logic_rules(self) -> bool:
         pass
+
+    def __try_all_rules(self, restaurant, consequent) -> bool:
+        truth_table = {'touristic': None,
+                       'seats': None,
+                       'romantic': None,
+                       'children': None}
+
+        if consequent == "touristic":
+            # Rule 1:
+            if restaurant['food_quality'] == "good" and restaurant['pricerange'] == "cheap":
+                truth_table['touristic'] = True
+            # Rule 2: here False overrides True due to order, so contradiction resolved.
+            if restaurant['food'] == "romanian":
+                truth_table['touristic'] = False
+                
+        # Rule 3:
+        if consequent == "seats":
+            if restaurant['crowdedness'] == 'busy':
+                truth_table['seats'] = True
+
+        # Rule 4:
+        if consequent == "children":
+            if restaurant['length_of_stay'] == "long":
+                truth_table['children'] = False
+            
+        if consequent == "romantic":
+            # Rules 6: here False overrides True due to order, so contradiction resolved.
+            if restaurant["length_of_stay"] == "long":
+                truth_table['romantic'] = True
+            # Rules 5:
+            if restaurant["crowdedness"] == "busy":
+                truth_table['romantic'] = False
+            
+        # for the restaurant, if any field evaluates to 0, return False:
+        for t_val in truth_table.values():
+            if t_val == False:
+                return False
+        return True
+                        
 
 
     def __find_restaurant(self) -> bool:
@@ -335,11 +495,13 @@ class DialogSMLogic:
                 ~self.possible_restaurants.restaurantname.isin(self.suggested_restaurants.restaurantname)]
         if not self.possible_restaurants.empty:
             self.current_restaurant = self.possible_restaurants.sample()
+            """
             if self.suggested_restaurants.empty:
                 self.suggested_restaurants = self.current_restaurant
             else:
                 self.suggested_restaurants = pd.concat([self.suggested_restaurants, self.current_restaurant],
                                                        ignore_index=True)
+            """
             found_new_restaurant = True
         # else:
         #     self.current_restaurant = pd.DataFrame()
@@ -525,8 +687,10 @@ Please provide {text} again.""".replace(
 
     @staticmethod
     def __state_8(options: Tuple) -> str:
-        text = """Do you have any other preferences about food quality, crowdedness, or length of stay?"""
+        #if PREV_STATE != 5:
+        text = """Do you have additional requirements?"""
         return text
+        #pass
 
     @staticmethod
     def __state_9(options: Tuple) -> None:
