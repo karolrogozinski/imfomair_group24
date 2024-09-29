@@ -229,7 +229,6 @@ class DialogSMLogic:
 
                 # once we have the list we start matching rules for each of them.
                 # TODO: I could have done it in the for loop above too but gonna take a look at it if I have time.
-                
                 for index, restaurant in self.possible_restaurants.iterrows():
                     for consequent in consequent_list:
                         t_val = self.__try_all_rules(restaurant=restaurant, consequent=consequent)
@@ -379,9 +378,6 @@ class DialogSMLogic:
         unknown_fields = [field for field, preferences in self.preferences.items()
                           if len(preferences) == 0]
         return unknown_fields
-
-    def __match_logic_rules(self) -> bool:
-        pass
 
     def __try_all_rules(self, restaurant, consequent) -> bool:
         truth_table = {'touristic': None,
