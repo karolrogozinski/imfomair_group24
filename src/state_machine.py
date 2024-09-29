@@ -23,6 +23,9 @@ REQUEST_WORDS = {
     'postcode': ['zipcode', 'postcode', 'code'],
     'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
     'pricerange': ['price', 'price range', 'cost', 'cheap', 'expensive'],
+    'food_quality': ['decent', 'fast food', 'good food'],
+    'crowdedness': ['busy', 'quiet'],
+    'length_of_stay': ['long', 'medium', 'short']
 }
 
 
@@ -140,10 +143,12 @@ class DialogSMLogic:
     def __state_4(self, sentence: str) -> None:
         found_new_restaurant = self.__find_restaurant()
 
+        # if there no restaurant matching the initial preferences, go to state 3
         if self.current_restaurant.empty:
             self.next_state = 3
             self.dialog_args = tuple([])
 
+        # if there are some restaurants matching the preferences
         else:
             self.next_state = 5
             tmp_options = [self.current_restaurant.restaurantname.iloc[0]]
