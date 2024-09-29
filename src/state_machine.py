@@ -231,6 +231,7 @@ class DialogSMLogic:
 
     def __state_8(self, sentence: str) -> None:
         # TODO: what to do with null here?
+        suggested = False
         if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'null', 'negate'):
 
             # consequents to work on
@@ -268,8 +269,10 @@ class DialogSMLogic:
                 if not self.possible_restaurants.empty and not self.suggested_restaurants.empty:
                     self.possible_restaurants = self.possible_restaurants[
                         ~self.possible_restaurants.restaurantname.isin(self.suggested_restaurants.restaurantname)]
+                    suggested = True
                 if not self.possible_restaurants.empty:
                     self.current_restaurant = self.possible_restaurants.sample()
+                    suggested = True
                     if self.suggested_restaurants.empty:
                         self.suggested_restaurants = self.current_restaurant
                         self.last_suggested_restaurant = self.current_restaurant
@@ -285,6 +288,12 @@ class DialogSMLogic:
                 else:
                     self.next_state = 5
                     tmp_options = [self.last_suggested_restaurant.restaurantname.iloc[0]]
+
+                    if suggested:
+                        for key in self.preferences.keys():
+                            info = self.current_restaurant[key] if self.current_restaurant[key].iloc[0] in self.preferences[key] \
+                                    else pd.Series([''])
+                            tmp_options.append(info.iloc[0])
 
                     self.dialog_args = tuple(tmp_options)
             else:
