@@ -184,8 +184,8 @@ class Interface:
 
     def __simple_dialog(self):
         print('\n###################################')
-        possible_choices = get_possible_choices('./data/restaurant_info.csv')
-        possible_restaurants = get_possible_restaurants('./data/restaurant_info.csv')
+        possible_choices = get_possible_choices('./data/restaurant_info_copy_.csv')
+        possible_restaurants = get_possible_restaurants('./data/restaurant_info_copy_.csv')
 
         sm = DialogSMLogic(possible_choices, self.__model, self.vectorizer, possible_restaurants, delay=self.delay,
                            tts=self.tts)
