@@ -22,7 +22,7 @@ REQUEST_WORDS = {
     'address': ['place', 'where', 'area', 'address', 'addr', 'location', 'street', 'city',],
     'postcode': ['zipcode', 'postcode', 'code'],
     'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
-    'pricerange': ['price', 'price range', 'cost', 'cheap', 'expensive'],
+    'pricerange': ['price', 'price range', 'cost', 'cheap', 'expensive', 'moderate'],
     # 'food_quality': ['decent', 'fast food', 'good food', 'fast', 'good', 'decent'],
     # 'crowdedness': ['busy', 'quiet'],
     # 'length_of_stay': ['long', 'medium', 'short']
@@ -33,11 +33,6 @@ POSSIBLE_SECONDARY_PREF_WORDS = {
     'children': ['child', 'children', 'kid'],
     'romantic': ['romantic', 'anniversary', 'wife', 'husband', 'romance']
 }
-
-global FIRST_TIME_8
-FIRST_TIME_8 = True
-global PREV_STATE
-PREV_STATE = None
 
 
 class DialogSMLogic:
@@ -108,7 +103,6 @@ class DialogSMLogic:
             6: self.__state_6,
             7: self.__state_7,
             8: self.__state_8,
-            9: self.__state_9
         }
 
         self.possible_choices: dict = possible_choices
@@ -132,14 +126,10 @@ class DialogSMLogic:
 
     def __state_0(self, sentence: str) -> None:
         self.next_state = 1
-        global PREV_STATE 
-        PREV_STATE = 0
         self.transition_dict[self.next_state](sentence)
 
     def __state_1(self, sentence: str) -> None:
         info_exists = self.__update_all_preferences(sentence)
-        global PREV_STATE 
-        PREV_STATE = 1
         unknown_fields = self.__get_unknown_fields()
 
         if info_exists:
@@ -162,8 +152,6 @@ class DialogSMLogic:
         if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
             self.next_state = 1
             self.transition_dict[self.next_state](sentence)
-        global PREV_STATE 
-        PREV_STATE = 2
 
     def __state_3(self, sentence: str) -> None:
         if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
@@ -171,15 +159,8 @@ class DialogSMLogic:
             self.next_state = 1
             self.transition_dict[self.next_state](sentence)
 
-        global FIRST_TIME_8
-        FIRST_TIME_8 = True
-        global PREV_STATE 
-        PREV_STATE = 3
-
     def __state_4(self, sentence: str) -> None:
         found_new_restaurant = self.__find_restaurant()
-        global PREV_STATE 
-        PREV_STATE = 4
         # if there no restaurant matching the initial preferences, go to state 3
         if self.current_restaurant.empty:
             self.next_state = 3
@@ -212,21 +193,14 @@ class DialogSMLogic:
             self.__parse_request(sentence)
             self.next_state = 6
 
-        global PREV_STATE 
-        PREV_STATE = 5
-
     def __state_6(self, sentence: str) -> None:
         self.next_state = 5
-        global PREV_STATE 
-        PREV_STATE = 6
         self.transition_dict[self.next_state](sentence)
 
     def __state_7(self, sentence: str) -> None:
         self.suggested_restaurants = pd.DataFrame()
         self.current_restaurant = pd.DataFrame()
         self.next_state = 1
-        global PREV_STATE 
-        PREV_STATE = 7
         self.transition_dict[self.next_state](sentence)
 
     def __state_8(self, sentence: str) -> None:
@@ -236,7 +210,6 @@ class DialogSMLogic:
 
             # consequents to work on
             consequent_list = []
-            global FIRST_TIME_8
 
             info_exists = self.__update_all_preferences(sentence, from_8=True)
             
@@ -250,7 +223,6 @@ class DialogSMLogic:
                 # we do the rule matching
                 # first check for the field of POSSIBLE_SECONDARY_PREF_WORDS
                 
-                FIRST_TIME_8 = False
                 for field in POSSIBLE_SECONDARY_PREF_WORDS.keys():
                     if len(self.secondary_preferences[field]) > 0:
                         consequent_list.append(field)
@@ -307,30 +279,6 @@ class DialogSMLogic:
 
                 self.dialog_args = tuple(tmp_options)
            
-        
-        # if user spesifically says no, continue with state 5:
-        """
-        if self.current_speech_act in ('negate'):
-            self.next_state = 5
-            tmp_options = [self.current_restaurant.restaurantname.iloc[0]]
-
-            for key in self.preferences.keys():
-                info = self.current_restaurant[key] if self.current_restaurant[key].iloc[0] in self.preferences[key] \
-                    else pd.Series([''])
-                tmp_options.append(info.iloc[0])
-
-            self.dialog_args = tuple(tmp_options)
-        global PREV_STATE 
-
-        PREV_STATE = 8
-        """
-
-
-    # TODO: delete state 9
-    def __state_9(self, sentence: str) -> None:
-        pass
-
-
     def __recognize_speech_act(self, sentence: str) -> str:
         """Recognize speach act of given sentence using text classification model
         """
@@ -504,13 +452,6 @@ class DialogSMLogic:
                 ~self.possible_restaurants.restaurantname.isin(self.suggested_restaurants.restaurantname)]
         if not self.possible_restaurants.empty:
             self.current_restaurant = self.possible_restaurants.sample()
-            """
-            if self.suggested_restaurants.empty:
-                self.suggested_restaurants = self.current_restaurant
-            else:
-                self.suggested_restaurants = pd.concat([self.suggested_restaurants, self.current_restaurant],
-                                                       ignore_index=True)
-            """
             found_new_restaurant = True
         # else:
         #     self.current_restaurant = pd.DataFrame()
@@ -573,7 +514,6 @@ class DialogSMOutputs:
             6: DialogSMOutputs.__state_6,
             7: DialogSMOutputs.__state_7,
             8: DialogSMOutputs.__state_8,
-            9: DialogSMOutputs.__state_9,
             -1: DialogSMOutputs.__exit,
         }
         text = transition_dict[state_number](options)
@@ -696,14 +636,8 @@ Please provide {text} again.""".replace(
 
     @staticmethod
     def __state_8(options: Tuple) -> str:
-        #if PREV_STATE != 5:
         text = """Do you have additional requirements?"""
         return text
-        #pass
-
-    @staticmethod
-    def __state_9(options: Tuple) -> None:
-        pass
 
     @staticmethod
     def __exit(_: Tuple) -> str:
