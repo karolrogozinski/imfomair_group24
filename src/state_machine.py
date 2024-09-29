@@ -62,7 +62,7 @@ class DialogSMLogic:
 
     """
     def __init__(self, possible_choices: Dict[str, List[str]], model: Model, vectorizer: CountVectorizer,
-                 restaurants: pd.DataFrame, random_suggestion: float = 0.2, max_distance: int = 1, delay: int = 0,
+                 restaurants: pd.DataFrame, random_suggestion: float = 0.0, max_distance: int = 1, delay: int = 0,
                  tts: bool = False) -> None:
         self.next_state: int = 0
         self.current_field: Tuple[str] = tuple()
