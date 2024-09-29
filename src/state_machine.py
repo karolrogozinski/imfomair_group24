@@ -23,7 +23,7 @@ REQUEST_WORDS = {
     'postcode': ['zipcode', 'postcode', 'code'],
     'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
     'pricerange': ['price', 'price range', 'cost', 'cheap', 'expensive'],
-    'food_quality': ['decent', 'fast food', 'good food'],
+    'food_quality': ['decent', 'fast food', 'good food', 'fast', 'good', 'decent'],
     'crowdedness': ['busy', 'quiet'],
     'length_of_stay': ['long', 'medium', 'short']
 }
@@ -75,6 +75,16 @@ class DialogSMLogic:
             'area': [],
             'pricerange': [],
         }
+        self.secondary_preferences: dict = {
+            'food_quality': [],
+            'crowdedness': [],
+            'length_of_stay': [],
+        }
+        self.secondary_antipathies: dict = {
+            'food_quality': [],
+            'crowdedness': [],
+            'length_of_stay': [],
+        }
         self.transition_dict = {
             0: self.__state_0,
             1: self.__state_1,
@@ -84,6 +94,8 @@ class DialogSMLogic:
             5: self.__state_5,
             6: self.__state_6,
             7: self.__state_7,
+            8: self.__state_8,
+            9: self.__state_9
         }
 
         self.possible_choices: dict = possible_choices
@@ -150,7 +162,7 @@ class DialogSMLogic:
 
         # if there are some restaurants matching the preferences
         else:
-            self.next_state = 5
+            self.next_state = 8
             tmp_options = [self.current_restaurant.restaurantname.iloc[0]]
 
             if found_new_restaurant:
@@ -185,6 +197,18 @@ class DialogSMLogic:
         self.next_state = 1
         self.transition_dict[self.next_state](sentence)
 
+    def __state_8(self, sentence: str) -> None:
+        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
+            
+            # I need to make the matching now.
+            info_exists = self.__update_all_preferences(sentence, from_8=True)
+            if info_exists:
+                pass
+
+    def __state_9(self, sentence: str) -> None:
+        pass
+
+
     def __recognize_speech_act(self, sentence: str) -> str:
         """Recognize speach act of given sentence using text classification model
         """
@@ -193,21 +217,27 @@ class DialogSMLogic:
 
         return speech_act
 
-    def __update_all_preferences(self, sentence: str) -> bool:
+    def __update_all_preferences(self, sentence: str, from_8=False) -> bool:
         info_exists = False
-        for preference in self.current_field or self.preferences.keys():
-            if self.__update_preference(sentence, preference):
-                info_exists = True
+
+        if not from_8:
+            for preference in self.current_field or self.preferences.keys():
+                if self.__update_preference(sentence, preference, from_8=from_8):
+                    info_exists = True
+        else:
+            for second_pref in self.secondary_preferences.keys():
+                if self.__update_preference(sentence, second_pref, from_8=from_8):
+                    info_exists = True
         return info_exists
 
-    def __update_preference(self, sentence: str, field: str) -> bool:
+    def __update_preference(self, sentence: str, field: str, from_8=False) -> bool:
         """ Update preferences for specified field based on given phrase
             and searches for antipathies that appear after the word 'no'.
         """
         negations = re.findall(r'(?:no|not) ([a-zA-Z]+)', sentence)
 
-        info_exists = self.__update_likes(sentence, field, self.max_distance)
-        self.__update_dislikes(negations, field, self.max_distance)
+        info_exists = self.__update_likes(sentence, field, self.max_distance, from_8=from_8)
+        self.__update_dislikes(negations, field, self.max_distance, from_8=from_8)
 
         if self.current_field and self.__is_dontcare(sentence) and not info_exists:
             self.preferences[field] = self.possible_choices[field].tolist()
@@ -221,7 +251,7 @@ class DialogSMLogic:
         """
         return any(word in sentence for word in DONTCARE_WORDS)
 
-    def __update_likes(self, sentence: str, field: str, max_distance: int) -> bool:
+    def __update_likes(self, sentence: str, field: str, max_distance: int, from_8=False) -> bool:
         current_word = None
         info_exists = False
 
@@ -233,14 +263,20 @@ class DialogSMLogic:
 
         if current_word:
             info_exists = True
-            if current_word not in self.preferences[field]:
-                self.preferences[field] = [current_word]
-                if current_word in self.antipathies[field]:
-                    self.antipathies[field].remove(current_word)
+            if not from_8:
+                if current_word not in self.preferences[field]:
+                    self.preferences[field] = [current_word]
+                    if current_word in self.antipathies[field]:
+                        self.antipathies[field].remove(current_word)
+            else:
+                if current_word not in self.secondary_preferences[field]:
+                    self.secondary_preferences[field] = [current_word]
+                    if current_word in self.secondary_antipathies[field]:
+                        self.secondary_preferences[field].remove(current_word)
 
         return info_exists
 
-    def __update_dislikes(self, negations: List[str], field: str, max_distance: int) -> None:
+    def __update_dislikes(self, negations: List[str], field: str, max_distance: int, from_8=False) -> None:
         current_word = None
 
         for word in negations:
@@ -250,9 +286,14 @@ class DialogSMLogic:
                     max_distance = textdistance.levenshtein(word, value)
 
         if current_word:
-            self.antipathies[field].append(current_word)
-            if current_word in self.preferences[field]:
-                self.preferences[field].remove(current_word)
+            if not from_8:
+                self.antipathies[field].append(current_word)
+                if current_word in self.preferences[field]:
+                    self.preferences[field].remove(current_word)
+            else:
+                self.secondary_antipathies[field].append(current_word)
+                if current_word in self.secondary_preferences[field]:
+                    self.secondary_preferences[field].remove(current_word)
 
     def __get_unknown_fields(self) -> List[str]:
         """Returns a list of fields for which the user has not specified a preference.
@@ -261,35 +302,39 @@ class DialogSMLogic:
                           if len(preferences) == 0]
         return unknown_fields
 
+    def __match_logic_rules(self) -> bool:
+        pass
+
+
     def __find_restaurant(self) -> bool:
         """ Finds a restaurant based on user likes and dislikes.
             In case of many possibilities, randomly chooses one of them, trying to avoid the previously chosen one.
         """
         possible_flag = 0
-        possible_restaurants = pd.DataFrame()
+        self.possible_restaurants = pd.DataFrame()
         found_new_restaurant = False
 
         for key in self.preferences.keys():
             if len(self.preferences[key]) > 0:
                 # preferences
                 if possible_flag > 0:
-                    possible_restaurants = possible_restaurants[possible_restaurants[key].isin(self.preferences[key])]
+                    self.possible_restaurants = self.possible_restaurants[self.possible_restaurants[key].isin(self.preferences[key])]
                 else:
-                    possible_restaurants = self.restaurants_base[self.restaurants_base[key].isin(self.preferences[key])]
+                    self.possible_restaurants = self.restaurants_base[self.restaurants_base[key].isin(self.preferences[key])]
                     possible_flag = 1
 
             # antipathies
             if possible_flag > 0:
-                possible_restaurants = possible_restaurants[~possible_restaurants[key].isin(self.antipathies[key])]
+                self.possible_restaurants = self.possible_restaurants[~self.possible_restaurants[key].isin(self.antipathies[key])]
             else:
-                possible_restaurants = self.restaurants_base[~self.restaurants_base[key].isin(self.antipathies[key])]
+                self.possible_restaurants = self.restaurants_base[~self.restaurants_base[key].isin(self.antipathies[key])]
                 possible_flag = 1
 
-        if not possible_restaurants.empty and not self.suggested_restaurants.empty:
-            possible_restaurants = possible_restaurants[
-                ~possible_restaurants.restaurantname.isin(self.suggested_restaurants.restaurantname)]
-        if not possible_restaurants.empty:
-            self.current_restaurant = possible_restaurants.sample()
+        if not self.possible_restaurants.empty and not self.suggested_restaurants.empty:
+            self.possible_restaurants = self.possible_restaurants[
+                ~self.possible_restaurants.restaurantname.isin(self.suggested_restaurants.restaurantname)]
+        if not self.possible_restaurants.empty:
+            self.current_restaurant = self.possible_restaurants.sample()
             if self.suggested_restaurants.empty:
                 self.suggested_restaurants = self.current_restaurant
             else:
@@ -355,6 +400,9 @@ class DialogSMOutputs:
             4: DialogSMOutputs.__state_4,
             5: DialogSMOutputs.__state_5,
             6: DialogSMOutputs.__state_6,
+            7: DialogSMOutputs.__state_7,
+            8: DialogSMOutputs.__state_8,
+            9: DialogSMOutputs.__state_9,
             -1: DialogSMOutputs.__exit,
         }
         text = transition_dict[state_number](options)
@@ -473,6 +521,15 @@ Please provide {text} again.""".replace(
 
     @staticmethod
     def __state_7(options: Tuple) -> None:
+        pass
+
+    @staticmethod
+    def __state_8(options: Tuple) -> str:
+        text = """Do you have any other preferences about food quality, crowdedness, or length of stay?"""
+        return text
+
+    @staticmethod
+    def __state_9(options: Tuple) -> None:
         pass
 
     @staticmethod

@@ -66,11 +66,17 @@ def get_possible_choices(path: str) -> Dict[str, List]:
     price_range_list = df_dialogues['pricerange'].unique()
     area_list = df_dialogues['area'].unique()[:-1]
     food_list = df_dialogues['food'].unique()
+    food_quality_list = df_dialogues['food_quality'].unique()
+    crowdedness_list = df_dialogues['crowdedness'].unique()
+    length_of_stay_list = df_dialogues['length_of_stay'].unique()
 
     choices: dict = {
         'food': food_list,
         'area': area_list,
         'pricerange': price_range_list,
+        'food_quality': food_quality_list,
+        'crowdedness': crowdedness_list,
+        'length_of_stay':length_of_stay_list
     }
 
     return choices

@@ -8,8 +8,10 @@ def copy_csv(filename):
 
 # copy_csv('C:/Users/Galya/Documents/School/MAIR/restaurant-recommendations-dialog-system/data/restaurant_info')
 
-df = pd.read_csv('C:/Users/Galya/Documents/School/MAIR/restaurant-recommendations-dialog-system/data/restaurant_info_copy_.csv')
-df['food_quality'] = np.random.choice(['good food', 'fast food', 'decent'], size=len(df))
+# df = pd.read_csv('C:/Users/Galya/Documents/School/MAIR/restaurant-recommendations-dialog-system/data/restaurant_info_copy_.csv')
+df = pd.read_csv('./data/restaurant_info_copy_.csv')
+df['food_quality'] = np.random.choice(['good', 'fast', 'decent'], size=len(df))
 df['crowdedness'] = np.random.choice(['busy', 'quiet'], size=len(df))
-df['length_of_stay'] = np.random.choice(['long stay', 'short stay', 'medium stay'], size=len(df))
-df.to_csv("C:/Users/Galya/Documents/School/MAIR/restaurant-recommendations-dialog-system/data/restaurant_info_copy_.csv",index=False)
+df['length_of_stay'] = np.random.choice(['long', 'short', 'medium'], size=len(df))
+df.to_csv("./data/restaurant_info_copy_.csv",index=False)
+# df.to_csv("C:/Users/Galya/Documents/School/MAIR/restaurant-recommendations-dialog-system/data/restaurant_info_copy_.csv",index=False)
