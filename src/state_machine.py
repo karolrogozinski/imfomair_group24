@@ -177,6 +177,9 @@ class DialogSMLogic:
             self.current_field = self.dialog_args
             self.next_state = 1
             self.transition_dict[self.next_state](sentence)
+        elif self.current_speech_act in ('request', 'confirm'):
+            self.__parse_request(sentence)
+            self.next_state = 6
 
     def __state_4(self, sentence: str) -> None:
         found_new_restaurant = self.__find_restaurant()
@@ -254,7 +257,7 @@ class DialogSMLogic:
                         t_val = self.__try_all_rules(restaurant=restaurant, consequent=consequent)
 
                         # enter the truth value for the consequent.
-                        self.truth_table[consequent] = t_val
+                        # self.truth_table[consequent] = t_val
                         if not t_val:
                             # if any of the rules evaluate to false for a restaurant, remove the restaurant from possible restaurants list.
                             self.possible_restaurants = self.possible_restaurants[self.possible_restaurants['restaurantname'] != restaurant['restaurantname']]
@@ -295,6 +298,23 @@ class DialogSMLogic:
                     self.dialog_args = tuple(tmp_options)
             else:
                 self.next_state = 5
+                #found_new_restaurant = self.__find_restaurant()
+
+                if not self.possible_restaurants.empty and not self.suggested_restaurants.empty:
+                    self.possible_restaurants = self.possible_restaurants[
+                        ~self.possible_restaurants.restaurantname.isin(self.suggested_restaurants.restaurantname)]
+                    suggested = True
+                if not self.possible_restaurants.empty:
+                    self.current_restaurant = self.possible_restaurants.sample()
+                    suggested = True
+                    if self.suggested_restaurants.empty:
+                        self.suggested_restaurants = self.current_restaurant
+                        self.last_suggested_restaurant = self.current_restaurant
+                    else:
+                        self.suggested_restaurants = pd.concat([self.suggested_restaurants, self.current_restaurant],
+                                                            ignore_index=True)
+                        self.last_suggested_restaurant = self.current_restaurant
+
                 tmp_options = [self.current_restaurant.restaurantname.iloc[0]]
 
                 for key in self.preferences.keys():
@@ -303,6 +323,10 @@ class DialogSMLogic:
                     tmp_options.append(info.iloc[0])
 
                 self.dialog_args = tuple(tmp_options)
+
+                if self.possible_restaurants.empty:
+                    tmp_options = [self.current_restaurant.restaurantname.iloc[0]]
+                    self.dialog_args = tuple(tmp_options)
            
     def __recognize_speech_act(self, sentence: str) -> str:
         """Recognize speach act of given sentence using text classification model
@@ -418,6 +442,8 @@ class DialogSMLogic:
                 self.antecedens["food_quality"] = "good"
                 self.antecedens["pricerange"] = "cheap"
                 self.antecedens["food"] = "not romanian"
+            else:
+                truth_table['touristic'] = False
             # Rule 2: here False overrides True due to order, so contradiction resolved.
             if restaurant['food'] == "romanian":
                 truth_table['touristic'] = False
@@ -427,6 +453,8 @@ class DialogSMLogic:
             if restaurant['crowdedness'] == 'busy':
                 truth_table['seats'] = True
                 self.antecedens["crowdedness"] = "busy"
+            else:
+                truth_table['seats'] = False
 
         if consequent == "children":
             # Rule 4:
@@ -443,6 +471,8 @@ class DialogSMLogic:
                 truth_table['romantic'] = True
                 self.antecedens["food_quality"] = "good"
                 self.antecedens["crowdedness"] = "not busy"
+            else:
+                truth_table['romantic'] = False
             # Rules 5:
             if restaurant["crowdedness"] == "busy":
                 truth_table['romantic'] = False
@@ -532,6 +562,10 @@ class DialogSMLogic:
     def __prepare_requested_fields(self, requests: List[str]) -> None:
         """Sets up information for dialogs based on requested fields.
         """
+        try:
+            self.current_restaurant = self.last_suggested_restaurant
+        except:
+            pass
         dialog_args = list()
         dialog_args.append(self.current_restaurant.restaurantname.iloc[0])
         for field in ('food', 'phone', 'pricerange', 'postcode'):
@@ -691,11 +725,11 @@ Please provide {text} again.""".replace(
                             else:
                                 antecedent_string = f"{antecedent_string} the cousine is {antecedents["food"]}"
                     
-                text = f"{text} \nThe restaurant is {consequent} because {antecedent_string}\n"
+                text = f"{text} \n\nThe restaurant is {consequent} because {antecedent_string}.\n"
 
 
         if len(options) != 5:
-            text += ' Do you have any other preferences or this suggestion satisfies you and want to hear more details?'
+            text += '\nDo you have any other preferences or this suggestion satisfies you and want to hear more details?'
         return text
 
     @staticmethod
