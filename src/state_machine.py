@@ -70,6 +70,23 @@ class DialogSMLogic:
         self.dialog_args: Tuple = tuple()
         self.current_restaurant: pd.DataFrame = pd.DataFrame()
         self.suggested_restaurants: pd.DataFrame = pd.DataFrame()
+        
+        # consequent list, antecedent list and respective truth values
+        self.consequents = []
+        self.antecedens: dict = {
+            'food_quality': None,
+            'crowdedness': None,
+            'length_of_stay': None,
+            'area': None,
+            'pricerange': None,
+            'food': None
+        }
+        self.truth_table: dict = {
+            'touristic': None,
+            'seats': None,
+            'romantic': None,
+            'children': None
+        }
 
         self.preferences: dict = {
             'food': [],
@@ -129,6 +146,7 @@ class DialogSMLogic:
         self.transition_dict[self.next_state](sentence)
 
     def __state_1(self, sentence: str) -> None:
+        self.__reset_inference_rules()
         info_exists = self.__update_all_preferences(sentence)
         unknown_fields = self.__get_unknown_fields()
 
@@ -154,6 +172,7 @@ class DialogSMLogic:
             self.transition_dict[self.next_state](sentence)
 
     def __state_3(self, sentence: str) -> None:
+        self.__reset_inference_rules()
         if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
             self.current_field = self.dialog_args
             self.next_state = 1
@@ -231,7 +250,11 @@ class DialogSMLogic:
                 # TODO: I could have done it in the for loop above too but gonna take a look at it if I have time.
                 for index, restaurant in self.possible_restaurants.iterrows():
                     for consequent in consequent_list:
+
                         t_val = self.__try_all_rules(restaurant=restaurant, consequent=consequent)
+
+                        # enter the truth value for the consequent.
+                        self.truth_table[consequent] = t_val
                         if not t_val:
                             # if any of the rules evaluate to false for a restaurant, remove the restaurant from possible restaurants list.
                             self.possible_restaurants = self.possible_restaurants[self.possible_restaurants['restaurantname'] != restaurant['restaurantname']]
@@ -265,6 +288,9 @@ class DialogSMLogic:
                             info = self.current_restaurant[key] if self.current_restaurant[key].iloc[0] in self.preferences[key] \
                                     else pd.Series([''])
                             tmp_options.append(info.iloc[0])
+
+                        tmp_options.append(self.antecedens)
+                        tmp_options.append(self.truth_table)
 
                     self.dialog_args = tuple(tmp_options)
             else:
@@ -389,35 +415,69 @@ class DialogSMLogic:
             # Rule 1:
             if restaurant['food_quality'] == "good" and restaurant['pricerange'] == "cheap":
                 truth_table['touristic'] = True
+                self.antecedens["food_quality"] = "good"
+                self.antecedens["pricerange"] = "cheap"
+                self.antecedens["food"] = "not romanian"
             # Rule 2: here False overrides True due to order, so contradiction resolved.
             if restaurant['food'] == "romanian":
                 truth_table['touristic'] = False
                 
-        # Rule 3:
         if consequent == "seats":
+            # Rule 3:
             if restaurant['crowdedness'] == 'busy':
                 truth_table['seats'] = True
+                self.antecedens["crowdedness"] = "busy"
 
-        # Rule 4:
         if consequent == "children":
+            # Rule 4:
             if restaurant['length_of_stay'] == "long":
                 truth_table['children'] = False
+            # Rule 4.5:
+            else:
+                truth_table['children'] = True
+                self.antecedens["length_of_stay"] = "not long"
             
         if consequent == "romantic":
             # Rules 6: here False overrides True due to order, so contradiction resolved.
             if restaurant["length_of_stay"] == "long":
                 truth_table['romantic'] = True
+                self.antecedens["food_quality"] = "good"
+                self.antecedens["crowdedness"] = "not busy"
             # Rules 5:
             if restaurant["crowdedness"] == "busy":
                 truth_table['romantic'] = False
             
         # for the restaurant, if any field evaluates to 0, return False:
+        # Since this function already runs for only 1 consequent, we can update the truth table of the class directly.
         for t_val in truth_table.values():
             if t_val == False:
                 return False
+            
+        for key, val in truth_table.items():
+            if val == True:
+                self.truth_table[consequent] = True
+            
+        self.consequents.append(consequent)
         return True
                         
-
+    
+    def __reset_inference_rules(self):
+        """ In states 1 and 3, we need to reset inference rule data. """
+        self.consequents = []
+        self.antecedens: dict = {
+            'food_quality': None,
+            'crowdedness': None,
+            'length_of_stay': None,
+            'area': None,
+            'pricerange': None,
+            'food': None
+        }
+        self.truth_table: dict = {
+            'touristic': None,
+            'seats': None,
+            'romantic': None,
+            'children': None
+        }
 
     def __find_restaurant(self) -> bool:
         """ Finds a restaurant based on user likes and dislikes.
@@ -563,8 +623,8 @@ Please provide {text} again.""".replace(
     def __state_5(options: Tuple) -> str:
         if len(options) == 1:
             text = f'There are no more options, so as the last one was {options[0]}. \n'
-        elif len(options) == 5:
-            text = 'Do you have any more questions or comments about suggested restaurant?'
+        # elif len(options) == 5:
+        #    text = 'Do you have any more questions or comments about suggested restaurant?'
         else:
             name = options[0]
             food = options[1]
@@ -586,6 +646,53 @@ Please provide {text} again.""".replace(
                 text += f'restaurant in the {area} part of the town.'
 
             text = f'My suggestion is {name}. \n{text}'
+
+
+            # now we work on the inference related preferences:
+
+            if len(options) > 4:
+                # consequents = options[5].keys()
+                truth_table = options[5]
+                antecedents = options[4]
+                antecedent_string = ""
+                for key, val in truth_table.items():
+                    # if the truth table says true for a consequent
+                    if val:
+                        consequent = key
+                        # then we build the antecedent list
+                        if antecedents["food_quality"]:
+                            if antecedent_string != "":
+                                antecedent_string = f"{antecedent_string} and the food quality is {antecedents["food_quality"]}"
+                            else:
+                                antecedent_string = f"{antecedent_string} the food quality is {antecedents["food_quality"]}"
+                        if antecedents["crowdedness"]:
+                            if antecedent_string != "":
+                                antecedent_string = f"{antecedent_string} and the occupancy is {antecedents["crowdedness"]}"
+                            else:
+                                antecedent_string = f"{antecedent_string} the occupancy is {antecedents["crowdedness"]}"
+                        if antecedents["length_of_stay"]:
+                            if antecedent_string != "":
+                                antecedent_string = f"{antecedent_string} and allowed stay duration is {antecedents["length_of_stay"]}"
+                            else:
+                                antecedent_string = f"{antecedent_string} the allowed stay duration is {antecedents["length_of_stay"]}"
+                        if antecedents["area"]:
+                            if antecedent_string != "":
+                                antecedent_string = f"{antecedent_string} and is in {antecedents["area"]}"
+                            else:
+                                antecedent_string = f"{antecedent_string} is not in {antecedents["area"]}"
+                        if antecedents["pricerange"]:
+                            if antecedent_string != "":
+                                antecedent_string = f"{antecedent_string} and pricerange is {antecedents["pricerange"]}"
+                            else:
+                                antecedent_string = f"{antecedent_string} the pricerange is {antecedents["pricerange"]}"
+                        if antecedents["food"]:
+                            if antecedent_string != "":
+                                antecedent_string = f"{antecedent_string} and the cousine is {antecedents["food"]}"
+                            else:
+                                antecedent_string = f"{antecedent_string} the cousine is {antecedents["food"]}"
+                    
+                text = f"{text} \nThe restaurant is {consequent} because {antecedent_string}\n"
+
 
         if len(options) != 5:
             text += ' Do you have any other preferences or this suggestion satisfies you and want to hear more details?'
