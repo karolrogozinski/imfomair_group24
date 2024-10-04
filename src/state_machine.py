@@ -16,7 +16,7 @@ import pyttsx3
 from src.models import Model
 
 
-DONTCARE_WORDS = ['any', 'dontcare', 'doesnt matter', "don't care", "doesn't matter", 'whatever']
+DONTCARE_WORDS = ['any', 'dontcare', 'doesnt matter', "don't care", "doesn't matter", 'whatever', 'dont care']
 REQUEST_WORDS = {
     'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree'],
     'address': ['place', 'where', 'area', 'address', 'addr', 'location', 'street', 'city',],
@@ -155,9 +155,11 @@ class DialogSMLogic:
                 self.next_state = 4
                 self.transition_dict[self.next_state](sentence)
             else:
+                # This else cannot happen any more since we come to 4 only if we know all the initial preferences.
                 if np.random.randint(0, 100) / 100 >= self.random_suggestion_th:
                     self.next_state = 3
-                    self.dialog_args = tuple([random.choice(unknown_fields)])
+                    # self.dialog_args = tuple([random.choice(unknown_fields)])
+                    self.dialog_args = tuple(unknown_fields)
                 else:
                     self.next_state = 4
                     self.transition_dict[self.next_state](sentence)
@@ -654,11 +656,17 @@ Please provide {text} again.""".replace(
     def __state_3(options: Tuple) -> str:
         pref = ''
         text = 'I am not sure about the results.'
-        if len(options) == 1:
-            pref = options[0] + ' '
 
-        text += f""" Could you provide another {pref}preference?""".replace(
-            'food', 'cuisine type').replace('_', ' ')
+        # find which preferences are missing
+        # missing_preferences = ""
+        
+        join_options = lambda options: ', '.join(options)
+        text += f" The missing fields are: {join_options(options)}."
+        #if len(options) == 1:
+        #    pref = options[0] + ' '
+
+        #text += f""" Could you provide another {pref}preference?""".replace(
+        #    'food', 'cuisine type').replace('_', ' ')
         return text
 
     @staticmethod
