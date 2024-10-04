@@ -19,7 +19,7 @@ if __name__ == '__main__':
                         help="""Model to train and predict:
                                 bm: BaselineMajor
                                 brb: BaselineRuleBased
-                                lr: LogisticRegressio
+                                lr: LogisticRegression
                                 fnn: FeedForwardNeuralNetwork""")
     parser.add_argument('-rd', '--response_delay', dest='response_delay', default=0, type=int,
                         help='Add delay before system responses in (s)')
