@@ -15,7 +15,7 @@ if __name__ == '__main__':
                         default='dialog_acts.dat', help='File in data folder in .dat format')
     parser.add_argument('-t', '--task', dest='task',
                         default='1B', help='Project subpart to run')
-    parser.add_argument('-m', '--model', dest='model_name', default='brb',
+    parser.add_argument('-m', '--model', dest='model_name', default='fnn',
                         help="""Model to train and predict:
                                 bm: BaselineMajor
                                 brb: BaselineRuleBased

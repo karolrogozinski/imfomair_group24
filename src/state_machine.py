@@ -226,7 +226,7 @@ class DialogSMLogic:
         self.transition_dict[self.next_state](sentence)
 
     def __state_8(self, sentence: str) -> None:
-        # TODO: what to do with null here?
+        # some consuqents create speech act null, so here we include null too.
         suggested = False
         if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'null', 'negate'):
 
@@ -278,9 +278,14 @@ class DialogSMLogic:
                                                             ignore_index=True)
                         self.last_suggested_restaurant = self.current_restaurant
                         
+                try:
+                    if not self.last_suggested_restaurant.empty:
+                        first_suggestion = False
+                except:
+                    first_suggestion = True
 
-                if self.current_restaurant.empty:
-                    self.next_state = 3
+                if self.current_restaurant.empty or first_suggestion:
+                    self.next_state = 2
                     self.dialog_args = tuple([])
                 else:
                     self.next_state = 5
@@ -296,6 +301,7 @@ class DialogSMLogic:
                         tmp_options.append(self.truth_table)
 
                     self.dialog_args = tuple(tmp_options)
+            # if there are no secondary preferences:
             else:
                 self.next_state = 5
                 #found_new_restaurant = self.__find_restaurant()
