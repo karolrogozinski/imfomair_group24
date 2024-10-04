@@ -59,7 +59,7 @@ class ClassifierEvaluation:
             plt.title(f'Confusion matrix for {model_name} without duplicates', fontweight='bold')
         else:
             plt.title(f'Confusion matrix for {model_name} with duplicates', fontweight='bold')
-        plt.savefig(f'./reports/eval/{datetime.now()}_conf_matrix.png')
+        plt.savefig(f'./reports/eval/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_conf_matrix.png')
         print('Confusion matrix saved to tmp directory.')
 
     def show_misclassified(self) -> None:
