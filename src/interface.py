@@ -147,7 +147,7 @@ class Interface:
     def __evaluate(self) -> None:
         # TODO separate saving as the Evaluation method?
         print('Evaluating...')
-        filename = f'./reports/eval/{datetime.now()}_eval_report.txt'
+        filename = f'./reports/eval/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_eval_report.txt'
 
         stdout_origin = sys.stdout
         sys.stdout = open(filename, "w")
