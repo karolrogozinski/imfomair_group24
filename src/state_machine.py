@@ -514,6 +514,12 @@ class DialogSMLogic:
             'romantic': None,
             'children': None
         }
+        self.secondary_preferences: dict = {
+            'touristic': [],
+            'seats': [],
+            'romantic': [],
+            'children': []
+        }
 
     def __find_restaurant(self) -> bool:
         """ Finds a restaurant based on user likes and dislikes.
@@ -731,7 +737,10 @@ Please provide {text} again.""".replace(
                             else:
                                 antecedent_string = f"{antecedent_string} the cousine is {antecedents["food"]}"
                     
-                text = f"{text} \n\nThe restaurant is {consequent} because {antecedent_string}.\n"
+                if consequent == "seats":
+                    text = f"{text} \n\nThe restaurant is assigned {consequent} because {antecedent_string}.\n"
+                else:
+                    text = f"{text} \n\nThe restaurant is {consequent} because {antecedent_string}.\n"
 
 
         if len(options) != 5:
