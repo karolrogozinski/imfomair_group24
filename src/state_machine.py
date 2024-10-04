@@ -514,6 +514,12 @@ class DialogSMLogic:
             'romantic': None,
             'children': None
         }
+        self.secondary_preferences: dict = {
+            'touristic': [],
+            'seats': [],
+            'romantic': [],
+            'children': []
+        }
 
     def __find_restaurant(self) -> bool:
         """ Finds a restaurant based on user likes and dislikes.
