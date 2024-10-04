@@ -43,6 +43,22 @@ class ClassifierEvaluation:
         sns.heatmap(matrix, annot=True, fmt=".0%", cmap='Blues', xticklabels=class_names, yticklabels=class_names)
         plt.xlabel('Actual')
         plt.ylabel('Predictions')
+
+        # Get model name
+        if model == "bm":
+            model_name = "Baseline Model"
+        elif model == "brb":
+            model_name = "Base Line Rule Based Model"
+        elif model == "fnn":
+            model_name = "Feed Forward NN Model"
+        else:
+            model_name = "Logistic Regression Model"
+
+        # Add title to confusion matrix.
+        if drop_duplicates:
+            plt.title(f'Confusion matrix for {model_name} without duplicates', fontweight='bold')
+        else:
+            plt.title(f'Confusion matrix for {model_name} with duplicates', fontweight='bold')
         plt.savefig(f'./reports/eval/{datetime.now()}_conf_matrix.png')
         print('Confusion matrix saved to tmp directory.')
 
