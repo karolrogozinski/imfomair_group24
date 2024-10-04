@@ -38,9 +38,9 @@ if __name__ == '__main__':
     args.drop_duplicates = True if args.drop_duplicates == 'True' else False
     args.hyper_param_tuning = True if args.hyper_param_tuning == 'True' else False
 
-    #args.hyper_param_tuning = True
-    args.drop_duplicates = True
-    args.evaluate = True
+    # args.hyper_param_tuning = True
+    # args.drop_duplicates = True
+    # args.evaluate = True
 
     interface = Interface(datapath=args.datapath, model=args.model_name, drop_duplicates=args.drop_duplicates,
                           evaluate=args.evaluate, task=args.task, hyper_param_tuning=args.hyper_param_tuning, 
