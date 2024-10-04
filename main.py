@@ -15,11 +15,11 @@ if __name__ == '__main__':
                         default='dialog_acts.dat', help='File in data folder in .dat format')
     parser.add_argument('-t', '--task', dest='task',
                         default='1B', help='Project subpart to run')
-    parser.add_argument('-m', '--model', dest='model_name', default='fnn',
+    parser.add_argument('-m', '--model', dest='model_name', default='brb',
                         help="""Model to train and predict:
                                 bm: BaselineMajor
                                 brb: BaselineRuleBased
-                                lr: LogisticRegressio
+                                lr: LogisticRegression
                                 fnn: FeedForwardNeuralNetwork""")
     parser.add_argument('-rd', '--response_delay', dest='response_delay', default=0, type=int,
                         help='Add delay before system responses in (s)')
@@ -40,7 +40,6 @@ if __name__ == '__main__':
 
     #args.hyper_param_tuning = True
     #args.drop_duplicates = True
-    args.evaluate = True
 
     interface = Interface(datapath=args.datapath, model=args.model_name, drop_duplicates=args.drop_duplicates,
                           evaluate=args.evaluate, task=args.task, hyper_param_tuning=args.hyper_param_tuning, 

@@ -35,7 +35,7 @@ class ClassifierEvaluation:
         self.recall = recall_score(self.y_true, self.y_pred, average="macro", zero_division=1)
         self.f1_score = f1_score(self.y_true, self.y_pred, average="macro", zero_division=1)
 
-    def save_confusion_matrix(self) -> None:
+    def save_confusion_matrix(self, model, drop_duplicates) -> None:
         """Creates and saves the confusion matrix as a PNG file."""
         plt.figure(figsize=(10, 8))
         class_names = np.unique(self.y_true)
@@ -43,7 +43,7 @@ class ClassifierEvaluation:
         sns.heatmap(matrix, annot=True, fmt=".0%", cmap='Blues', xticklabels=class_names, yticklabels=class_names)
         plt.xlabel('Actual')
         plt.ylabel('Predictions')
-        plt.savefig(f'./reports/eval/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_conf_matrix.png')
+        plt.savefig(f'./reports/eval/{datetime.now()}_conf_matrix.png')
         print('Confusion matrix saved to tmp directory.')
 
     def show_misclassified(self) -> None:
