@@ -159,7 +159,7 @@ class Interface:
         evaluation = ClassifierEvaluation(y_pred=self.__y_pred, y_true=self.__y_test)
         evaluation.accuracy()
         evaluation.precision_recall_f1()
-        evaluation.save_confusion_matrix()
+        evaluation.save_confusion_matrix(self.model_name, self.drop_duplicates)
         print('-----------------------------------')
 
         sys.stdout.close()
