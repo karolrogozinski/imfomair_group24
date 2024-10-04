@@ -204,18 +204,26 @@ class DialogSMLogic:
             self.dialog_args = tuple(tmp_options)
 
     def __state_5(self, sentence: str) -> None:
+        #info_exists = self.__update_all_preferences(sentence)
         if self.current_speech_act == 'reqalts':
             if self.__update_all_preferences(sentence):
                 self.next_state = 1
             else:
                 self.next_state = 4
             self.transition_dict[self.next_state](sentence)
-        elif self.current_speech_act in ('negate', 'inform'):
+        elif self.current_speech_act in ( 'inform'):
+            #if self.__update_all_preferences(sentence):
             self.next_state = 7
             self.transition_dict[self.next_state](sentence)
+        elif self.current_speech_act == "negate":
+            if self.__update_all_preferences(sentence):
+                self.next_state = 7
         elif self.current_speech_act in ('request', 'confirm'):
             self.__parse_request(sentence)
             self.next_state = 6
+        else:
+            self.__parse_request(sentence)
+            self.next_state = 5
 
     def __state_6(self, sentence: str) -> None:
         self.next_state = 5
@@ -235,6 +243,7 @@ class DialogSMLogic:
             # consequents to work on
             consequent_list = []
 
+            # This is beacuse I want to update self.secondary_preferences
             info_exists = self.__update_all_preferences(sentence, from_8=True)
             
             # I need to make the matching now.
@@ -655,13 +664,17 @@ Please provide {text} again.""".replace(
     @staticmethod
     def __state_3(options: Tuple) -> str:
         pref = ''
-        text = 'I am not sure about the results.'
 
         # find which preferences are missing
         # missing_preferences = ""
         
         join_options = lambda options: ', '.join(options)
-        text += f" The missing fields are: {join_options(options)}."
+        missings = join_options(options)
+
+        if missings == "":
+            text = "There is no restaurant with given paramteres. Please change some of the preferences."
+        else:
+            text = f'Please provide all preferences. The missing fields are: {missings}.'
         #if len(options) == 1:
         #    pref = options[0] + ' '
 
@@ -686,25 +699,26 @@ Please provide {text} again.""".replace(
             price_range = options[3]
 
             text = 'It is '
-            if food and area and price_range:
+            if food != "" and area != "" and price_range != "":
                 text += f'{price_range}, {food} restaurant in the {area} part of the town.'
-            elif food and area:
+            elif food != "" and area != "":
                 text += f'{food} restaurant in the {area} part of town.'
-            elif area and price_range:
+            elif area != "" and price_range != "":
                 text += f'{price_range} restaurant in the {area} part of the town.'
-            elif food and price_range:
+            elif food != "" and price_range != "":
                 text += f'{price_range}, {food} restaurant.'
-            elif food or price_range:
+            elif food != "" or price_range:
                 text += f'{price_range + food} restaurant.'
-            else:
+            elif area != "":
                 text += f'restaurant in the {area} part of the town.'
+            else:
+                text = text.replace("It is ", "", 1)
 
             text = f'My suggestion is {name}. \n{text}'
 
 
-            # now we work on the inference related preferences:
-
-            if len(options) > 4:
+            # now we output the inference related preferences:
+            if len(options) > 4 and options[5] != []:
                 # consequents = options[5].keys()
                 truth_table = options[5]
                 antecedents = options[4]
@@ -752,7 +766,7 @@ Please provide {text} again.""".replace(
 
 
         if len(options) != 5:
-            text += '\nDo you have any other preferences or this suggestion satisfies you and want to hear more details?'
+            text += '\nYou can change your preferences or request more details.'
         return text
 
     @staticmethod
@@ -774,6 +788,7 @@ Please provide {text} again.""".replace(
                 text += food + ' restaurant'
             else:
                 text += price_range + ' restaurant'
+
 
             if options[5]:
                 area = options[5][0]
