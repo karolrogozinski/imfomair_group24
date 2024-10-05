@@ -218,7 +218,7 @@ class DialogSMLogic:
         elif self.current_speech_act == "negate":
             if self.__update_all_preferences(sentence):
                 self.next_state = 7
-        elif self.current_speech_act in ('request', 'confirm'):
+        elif self.current_speech_act in ('request', 'confirm', 'affirm'):
             self.__parse_request(sentence)
             self.next_state = 6
         else:
@@ -649,7 +649,7 @@ How can I help you?"""
     @staticmethod
     def __state_2(options: Tuple) -> str:
         if len(options) == 0:
-            text = 'any preferences'
+            text = 'any primary preference'
         elif len(options) == 1:
             text = options[0]
         elif len(options) == 2:
@@ -718,7 +718,7 @@ Please provide {text} again.""".replace(
 
 
             # now we output the inference related preferences:
-            if len(options) > 4 and options[5] != []:
+            if len(options) > 4 and isinstance(options[5], dict):
                 # consequents = options[5].keys()
                 truth_table = options[5]
                 antecedents = options[4]
@@ -766,7 +766,7 @@ Please provide {text} again.""".replace(
 
 
         if len(options) != 5:
-            text += '\nYou can change your preferences or request more details.'
+            text += '\nYou can change your preferences (area, price range, cuisine) or request more details.'
         return text
 
     @staticmethod
