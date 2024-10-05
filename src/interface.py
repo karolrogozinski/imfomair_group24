@@ -139,7 +139,7 @@ class Interface:
             solver_list = ["lbfgs", "newton-cg", "sag", "saga"]
             penalty_list = ["l2"]
             C_list = [0.001, 0.01, 0.1, 1, 10, 100]
-            max_iter_list = [100, 200, 500]
+            max_iter_list = [100, 200, 500, 1000]
 
             # df to hold results
             results_df = pd.DataFrame(columns=['Solver', 'Penalty', 'C', 'Max Iter', 'Accuracy', 'Precision', 'Recall', 'F1'])
