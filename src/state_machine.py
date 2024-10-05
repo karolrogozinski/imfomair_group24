@@ -175,13 +175,10 @@ class DialogSMLogic:
 
     def __state_3(self, sentence: str) -> None:
         self.__reset_inference_rules()
-        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate'):
+        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate', 'request', 'affirm'):
             self.current_field = self.dialog_args
             self.next_state = 1
             self.transition_dict[self.next_state](sentence)
-        elif self.current_speech_act in ('request', 'confirm'):
-            self.__parse_request(sentence)
-            self.next_state = 6
 
     def __state_4(self, sentence: str) -> None:
         found_new_restaurant = self.__find_restaurant()
@@ -676,6 +673,7 @@ Please provide {text} again.""".replace(
         join_options = lambda options: ', '.join(options)
         missings = join_options(options)
 
+        # if there are unknown fields, ask for them. If all preferences are known report there is no such restaurant.
         if missings == "":
             text = "There is no restaurant with given paramteres. Please change some of the preferences."
         else:
