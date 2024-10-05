@@ -18,9 +18,9 @@ from src.models import Model
 
 DONTCARE_WORDS = ['any', 'dontcare', 'doesnt matter', "don't care", "doesn't matter", 'whatever', 'dont care']
 REQUEST_WORDS = {
-    'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree'],
+    'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree', 'indian', 'british', 'african', 'asian', 'australaisan', 'bistro', 'catalan', 'chinese', 'cuban', 'european', 'french', 'fusion', 'gastropub', 'international', 'italian', 'jamaican', 'japanese', 'korean', 'lebanese', 'mediterranean', 'moroccan', 'american', 'persian', 'polynesian', 'portuguese', 'romanian', 'seafood', 'spanish', 'steakhouse', 'swiss', 'thai', 'traditional', 'turkish', 'tuscan', 'vietnamese'],
     'address': ['place', 'where', 'area', 'address', 'addr', 'location', 'street', 'city',],
-    'postcode': ['zipcode', 'postcode', 'code'],
+    'postcode': ['zipcode', 'postcode', 'code', 'zip'],
     'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
     'pricerange': ['price', 'price range', 'cost', 'cheap', 'expensive', 'moderate'],
     # 'food_quality': ['decent', 'fast food', 'good food', 'fast', 'good', 'decent'],
