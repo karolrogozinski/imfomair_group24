@@ -1,17 +1,29 @@
+""" Standard libraries
+sys: basic system operations, like closing app
+datetime: adding timestamps
+"""
 import sys
 from datetime import datetime
 
+""" Third-party libraries
+pandas: data operations
+"""
 import pandas as pd
-import numpy as np
 
+""" Local files
+utils: basic utility functions
+models: classes containing models for speech acts classification
+evaluations: models evaluations
+state_machine: main dialog state machine
+"""
 from src.utils import prepare_data, get_possible_choices, get_possible_restaurants, automatic_speech_recognition
 from src.models import BaselineMajor, BaselineRuleBased, LogisticRegressorModel, FeedForwardNN
 from src.evaluations import ClassifierEvaluation
 from src.state_machine import DialogSMLogic
 
+
 class Interface:
-    """
-    # TODO add docstring
+    """ Class that manage main app interface.
     """
     def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool,
                  task: str, delay: int, tts: bool, asr: bool, hyper_param_tuning: bool) -> None:
@@ -29,8 +41,7 @@ class Interface:
     def run(self) -> None:
         self.__read_data()
         self.__read_model()
-        
-        
+
         # if we are going to perform hyper param tuning or the regular execution pattern
         if self.hyper_param_tuning:
             self.__hyper_param_tuning()
@@ -45,7 +56,8 @@ class Interface:
             elif self.task == '1B':
                 self.__simple_dialog()
             else:
-                pass # TODO part 1C
+                # Currently 1C part gets the same dialog act as for 1B (it was further develop to new match requirements)
+                pass
 
     @staticmethod
     def __welcome() -> None:
@@ -181,9 +193,6 @@ class Interface:
             # Save the results to an Excel file
             results_df.to_excel("./reports/eval/model_training_results_lr.xlsx", index=False)
 
-
-
-
     def __train_model(self) -> None:
         print('Training model... (it may take a while)')
         self.__model.fit(self.__X_train, self.__y_train)
@@ -193,9 +202,8 @@ class Interface:
         self.__y_pred = self.__model.predict(self.__X_test)
 
     def __evaluate(self) -> None:
-        # TODO separate saving as the Evaluation method?
         print('Evaluating...')
-        filename = f'./reports/eval/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_eval_report.txt'
+        filename = f'./reports/eval/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}_eval_report.txt'
 
         stdout_origin = sys.stdout
         sys.stdout = open(filename, "w")

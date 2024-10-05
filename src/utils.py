@@ -1,3 +1,10 @@
+""" Third-party libraries
+pandas, numpy: data operations
+sklearn: vectorizer and function splitting data to train and test sets
+speech_recognition: speech recognition for ASR module
+sounddevice: recording sound from microphone
+typing: typing purposes
+"""
 import numpy as np
 import pandas as pd
 
@@ -10,23 +17,9 @@ import sounddevice as sd
 from typing import Dict, List
 
 
-# TODO change docstring styles
-
 def prepare_data(path: str, drop_duplicates: bool = False, vectorize: bool = False) -> tuple:
     """Preparing data for modeling - creating target, getting lowercase,
         splitting and optionally dropping duplicates.
-
-    Parameters:
-    ---
-    path: str
-        path to the data file in .dat format
-    drop_duplicates: bool
-        True is the duplicates should be dropped, empty either way
-
-    Returns:
-    ---
-    tuple
-        list of data split into X_train, X_test, y_train, y_test
     """
     df = pd.read_csv(path, names=['sentence'])
 
