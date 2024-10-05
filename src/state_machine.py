@@ -526,8 +526,7 @@ class DialogSMLogic:
             
         self.consequents.append(consequent)
         return True
-                        
-    
+
     def __reset_inference_rules(self):
         """ In states 1 and 3, we need to reset inference rule data. """
         self.consequents = []
@@ -751,34 +750,34 @@ Please provide {text} again.""".replace(
                         # then we build the antecedent list
                         if antecedents["food_quality"]:
                             if antecedent_string != "":
-                                antecedent_string = f"{antecedent_string} and the food quality is {antecedents["food_quality"]}"
+                                antecedent_string = f'{antecedent_string} and the food quality is {antecedents["food_quality"]}'
                             else:
-                                antecedent_string = f"{antecedent_string} the food quality is {antecedents["food_quality"]}"
+                                antecedent_string = f'{antecedent_string} the food quality is {antecedents["food_quality"]}'
                         if antecedents["crowdedness"]:
                             if antecedent_string != "":
-                                antecedent_string = f"{antecedent_string} and the occupancy is {antecedents["crowdedness"]}"
+                                antecedent_string = f'{antecedent_string} and the occupancy is {antecedents["crowdedness"]}'
                             else:
-                                antecedent_string = f"{antecedent_string} the occupancy is {antecedents["crowdedness"]}"
+                                antecedent_string = f'{antecedent_string} the occupancy is {antecedents["crowdedness"]}'
                         if antecedents["length_of_stay"]:
                             if antecedent_string != "":
-                                antecedent_string = f"{antecedent_string} and allowed stay duration is {antecedents["length_of_stay"]}"
+                                antecedent_string = f'{antecedent_string} and allowed stay duration is {antecedents["length_of_stay"]}'
                             else:
-                                antecedent_string = f"{antecedent_string} the allowed stay duration is {antecedents["length_of_stay"]}"
+                                antecedent_string = f'{antecedent_string} the allowed stay duration is {antecedents["length_of_stay"]}'
                         if antecedents["area"]:
                             if antecedent_string != "":
-                                antecedent_string = f"{antecedent_string} and is in {antecedents["area"]}"
+                                antecedent_string = f'{antecedent_string} and is in {antecedents["area"]}'
                             else:
-                                antecedent_string = f"{antecedent_string} is not in {antecedents["area"]}"
+                                antecedent_string = f'{antecedent_string} is not in {antecedents["area"]}'
                         if antecedents["pricerange"]:
                             if antecedent_string != "":
-                                antecedent_string = f"{antecedent_string} and pricerange is {antecedents["pricerange"]}"
+                                antecedent_string = f'{antecedent_string} and pricerange is {antecedents["pricerange"]}'
                             else:
-                                antecedent_string = f"{antecedent_string} the pricerange is {antecedents["pricerange"]}"
+                                antecedent_string = f'{antecedent_string} the pricerange is {antecedents["pricerange"]}'
                         if antecedents["food"]:
                             if antecedent_string != "":
-                                antecedent_string = f"{antecedent_string} and the cousine is {antecedents["food"]}"
+                                antecedent_string = f'{antecedent_string} and the cousine is {antecedents["food"]}'
                             else:
-                                antecedent_string = f"{antecedent_string} the cousine is {antecedents["food"]}"
+                                antecedent_string = f'{antecedent_string} the cousine is {antecedents["food"]}'
                     
                 if consequent == "seats":
                     text = f"{text} \n\nThe restaurant is assigned {consequent} because {antecedent_string}.\n"
