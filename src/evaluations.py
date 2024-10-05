@@ -1,5 +1,13 @@
+""" Standard libraries
+datime: adding timestamps to evaluations.
+"""
 from datetime import datetime
 
+""" Third-party libraries
+pandas, numpy: data operations
+sklearn: evaluation metrics
+seaborn, matplotlib: plots, visualizations
+"""
 import pandas as pd
 import numpy as np
 

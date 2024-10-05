@@ -1,3 +1,6 @@
+""" Third-party libraries
+pandas, numpy: data operations
+"""
 import pandas as pd
 import numpy as np
 

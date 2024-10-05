@@ -1,8 +1,19 @@
+""" Standard libraries
+sys: basic system operations, like closing app
+datetime: adding timestamps
+"""
 import re
 import random
 import sys
 import time
 
+""" Third-party libraries
+pandas, numpy: data operations
+typing: typing purposes
+sklearn: vectorizer
+textdistance: calculating Lavenshtein distance
+pyttsx3: engine to perform TTS
+"""
 import pandas as pd
 import numpy as np
 
@@ -13,12 +24,19 @@ from sklearn.feature_extraction.text import CountVectorizer
 import textdistance
 import pyttsx3
 
+""" Local files
+models: Model abstract class for typing
+"""
 from src.models import Model
 
 
 DONTCARE_WORDS = ['any', 'dontcare', 'doesnt matter', "don't care", "doesn't matter", 'whatever', 'dont care']
 REQUEST_WORDS = {
-    'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree', 'indian', 'british', 'african', 'asian', 'australaisan', 'bistro', 'catalan', 'chinese', 'cuban', 'european', 'french', 'fusion', 'gastropub', 'international', 'italian', 'jamaican', 'japanese', 'korean', 'lebanese', 'mediterranean', 'moroccan', 'american', 'persian', 'polynesian', 'portuguese', 'romanian', 'seafood', 'spanish', 'steakhouse', 'swiss', 'thai', 'traditional', 'turkish', 'tuscan', 'vietnamese'],
+    'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree', 'indian', 'british', 'african', 'asian',
+             'australaisan', 'bistro', 'catalan', 'chinese', 'cuban', 'european', 'french', 'fusion', 'gastropub',
+             'international', 'italian', 'jamaican', 'japanese', 'korean', 'lebanese', 'mediterranean', 'moroccan',
+             'american', 'persian', 'polynesian', 'portuguese', 'romanian', 'seafood', 'spanish', 'steakhouse', 'swiss',
+             'thai', 'traditional', 'turkish', 'tuscan', 'vietnamese'],
     'address': ['place', 'where', 'area', 'address', 'addr', 'location', 'street', 'city',],
     'postcode': ['zipcode', 'postcode', 'code', 'zip'],
     'phone': ['telephone', 'phone', 'mobile', 'phone', 'contact', 'cell'],
