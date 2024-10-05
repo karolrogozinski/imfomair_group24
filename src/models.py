@@ -114,9 +114,9 @@ class BaselineRuleBased(Model):
 
 class LogisticRegressorModel(Model):
     
-    def fit(self, X_train: list, y_train: list) -> None:
+    def fit(self, X_train: list, y_train: list, solver="lbfgs", penalty="l2", C=1.0, max_iter=100) -> None:
         # Train the lr model.
-        self.lr_model = LogisticRegression(random_state = 42).fit(X_train, y_train)
+        self.lr_model = LogisticRegression(random_state = 42, solver=solver, penalty=penalty, C=C, max_iter=max_iter).fit(X_train, y_train)
 
     def predict(self, X_test):
         # Make predictions and return as pandas series.
