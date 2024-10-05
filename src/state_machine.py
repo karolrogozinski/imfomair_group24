@@ -218,7 +218,7 @@ class DialogSMLogic:
         elif self.current_speech_act == "negate":
             if self.__update_all_preferences(sentence):
                 self.next_state = 7
-        elif self.current_speech_act in ('request', 'confirm'):
+        elif self.current_speech_act in ('request', 'confirm', 'affirm'):
             self.__parse_request(sentence)
             self.next_state = 6
         else:
