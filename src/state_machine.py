@@ -175,7 +175,7 @@ class DialogSMLogic:
 
     def __state_3(self, sentence: str) -> None:
         self.__reset_inference_rules()
-        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate', 'request'):
+        if self.current_speech_act in ('inform', 'confirm', 'reqalts', 'negate', 'request', 'affirm'):
             self.current_field = self.dialog_args
             self.next_state = 1
             self.transition_dict[self.next_state](sentence)
