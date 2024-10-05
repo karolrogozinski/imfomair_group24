@@ -226,8 +226,13 @@ class DialogSMLogic:
             self.next_state = 5
 
     def __state_6(self, sentence: str) -> None:
-        self.next_state = 5
-        self.transition_dict[self.next_state](sentence)
+        if self.current_speech_act not in ("none"):
+            self.next_state = 5
+            self.transition_dict[self.next_state](sentence)
+        if self.current_speech_act == "negate":
+            if self.__update_all_preferences(sentence):
+                self.next_state = 5
+                self.transition_dict[self.next_state](sentence)
 
     def __state_7(self, sentence: str) -> None:
         self.suggested_restaurants = pd.DataFrame()
