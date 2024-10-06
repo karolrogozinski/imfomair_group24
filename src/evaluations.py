@@ -34,6 +34,9 @@ class ClassifierEvaluation:
         self.prec = precision_score(self.y_true, self.y_pred, average="macro", zero_division=1)
         self.recall = recall_score(self.y_true, self.y_pred, average="macro", zero_division=1)
         self.f1_score = f1_score(self.y_true, self.y_pred, average="macro", zero_division=1)
+        print(f"Precision: {self.prec}")
+        print(f"Recall: {self.recall}")
+        print(f"F1 Score: {self.f1_score}")
 
     def save_confusion_matrix(self, model, drop_duplicates) -> None:
         """Creates and saves the confusion matrix as a PNG file."""

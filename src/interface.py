@@ -133,7 +133,7 @@ class Interface:
                                     results_df = pd.concat([results_df, new_row], ignore_index=True)
             
             # Put the results into an Excel file
-            results_df.to_excel("./reports/eval/model_training_results_fnn.xlsx", index=False)
+            results_df.to_excel("./reports/eval/model_training_results_fnn_dup.xlsx", index=False)
         elif self.model_name == "lr":
             # Hyperparameters for Logistic Regression
             solver_list = ["lbfgs", "newton-cg", "sag", "saga"]
@@ -179,7 +179,7 @@ class Interface:
                             results_df = pd.concat([results_df, new_row], ignore_index=True)
             
             # Save the results to an Excel file
-            results_df.to_excel("./reports/eval/model_training_results_lr.xlsx", index=False)
+            results_df.to_excel("./reports/eval/model_training_results_lr_dup.xlsx", index=False)
 
 
 
