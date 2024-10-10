@@ -56,7 +56,7 @@ However it can by adjusted with many arguments
 
 ### Arguments
 ```python
-# -f FILENAME -m MODEL -rd RESPONSE_DELAY -dd DROP_DUPLICATES -e EVALUATE -tts TEXT_TO_SPEECH -asr AUTOMATIC_SPEECH_RECOGNITION
+# -f FILENAME -m MODEL -rd RESPONSE_DELAY -dd DROP_DUPLICATES -e EVALUATE -tts TEXT_TO_SPEECH -asr AUTOMATIC_SPEECH_RECOGNITION -fv FEMALE_VOICE
 parser.add_argument('-f', '--filename', dest='datapath',
                     default='dialog_acts.dat', help='File in data folder in .dat format')
 parser.add_argument('-t', '--task', dest='task',
@@ -75,13 +75,15 @@ parser.add_argument('-e', '--evaluate', dest='evaluate',action='store_true',
                     help='Make evaluation and save it to file')
 parser.add_argument('-tts', '--text_to_speech', dest='tts',action='store_true',
                     help='Use text-to-speech for system utterances')
+parser.add_argument('-fv', '--female_voice', dest='female_voice',action='store_true',
+                    help='Set female voice for system utterances')
 parser.add_argument('-asr', '--automatic_speech_recognition', dest='asr',action='store_true',
                     help='Use automatic speech recognition (ASR) for user utterances')
 ```
 
-For example to run part 1A with baseline ruled-based model and dropped duplicates:
+For example to run part 1A with baseline ruled-based model and dropped duplicates and text-to-speech female voice:
 ```bash
-$ python3 main.py -t 1A -m brb -dd
+$ python3 main.py -t 1A -m brb -dd -tts -fv
 ```
 
 ## Data

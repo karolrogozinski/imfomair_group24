@@ -81,7 +81,7 @@ class DialogSMLogic:
     """
     def __init__(self, possible_choices: Dict[str, List[str]], model: Model, vectorizer: CountVectorizer,
                  restaurants: pd.DataFrame, random_suggestion: float = 0.0, max_distance: int = 1, delay: int = 0,
-                 tts: bool = False) -> None:
+                 tts: bool = False, tts_female: bool = False) -> None:
         self.next_state: int = 0
         self.current_field: Tuple[str] = tuple()
         self.current_speech_act: str = 'info'
@@ -147,7 +147,7 @@ class DialogSMLogic:
         self.random_suggestion_th: float = random_suggestion
         self.max_distance: int = max_distance
         self.delay: int = delay
-        self.dialog_machine: DialogSMOutputs = DialogSMOutputs(tts=tts)
+        self.dialog_machine: DialogSMOutputs = DialogSMOutputs(tts=tts, tts_female=tts_female)
 
         self.dialog_machine.get_dialog_option(self.next_state, self.dialog_args)
 
@@ -630,10 +630,12 @@ class DialogSMOutputs:
         Dialog options outputs when entering the state - BEFORE applying state logic.
         Each of them takes dialog options as input to parametrize sentences.
     """
-    def __init__(self, tts: bool = False) -> None:
+    def __init__(self, tts: bool = False, tts_female: bool = False) -> None:
         self.tts = tts
         if tts:
             self.tts_engine = pyttsx3.init()
+            if tts_female:
+                self.tts_engine.setProperty('voice', 'com.apple.speech.synthesis.voice.samantha')
 
     def get_dialog_option(self, state_number: int, options: Tuple = ()) -> None:
         transition_dict = {

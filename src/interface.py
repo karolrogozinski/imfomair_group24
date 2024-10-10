@@ -26,7 +26,7 @@ class Interface:
     """ Class that manage main app interface.
     """
     def __init__(self, datapath: str, model: str, drop_duplicates: bool, evaluate: bool,
-                 task: str, delay: int, tts: bool, asr: bool, hyper_param_tuning: bool) -> None:
+                 task: str, delay: int, tts: bool, asr: bool, hyper_param_tuning: bool, female_voice: bool) -> None:
         self.datapath: str = './data/' + datapath
         self.model_name: str = model
         self.drop_duplicates: bool = drop_duplicates
@@ -36,6 +36,7 @@ class Interface:
         self.hyper_param_tuning: bool = hyper_param_tuning
         self.delay: int = delay
         self.tts: bool = tts
+        self.female_voice: bool = female_voice
         self.asr: bool = asr
 
     def run(self) -> None:
@@ -244,7 +245,7 @@ class Interface:
         possible_restaurants = get_possible_restaurants('./data/restaurant_info_copy_.csv')
 
         sm = DialogSMLogic(possible_choices, self.__model, self.vectorizer, possible_restaurants, delay=self.delay,
-                           tts=self.tts)
+                           tts=self.tts, tts_female=self.female_voice)
         while True:
             if self.asr:
                 sentence = automatic_speech_recognition()
