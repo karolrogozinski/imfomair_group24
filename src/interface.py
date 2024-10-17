@@ -1,14 +1,20 @@
 """ Standard libraries
-sys: basic system operations, like closing app
+sys, os: basic system operations, like closing app
 datetime: adding timestamps
+random: shuffling samples for experiment
 """
 import sys
+import os
+import random
 from datetime import datetime
 
 """ Third-party libraries
 pandas: data operations
+colorama: coloring input
 """
 import pandas as pd
+import colorama
+
 
 """ Local files
 utils: basic utility functions
@@ -39,6 +45,8 @@ class Interface:
         self.female_voice: bool = female_voice
         self.asr: bool = asr
 
+        colorama.init()
+
     def run(self) -> None:
         self.__read_data()
         self.__read_model()
@@ -56,6 +64,8 @@ class Interface:
                 self.__manual_prediction()
             elif self.task == '1B':
                 self.__simple_dialog()
+            elif self.task == '2':
+                self.__experiment()
             else:
                 # Currently 1C part gets the same dialog act as for 1B (it was further develop to new match requirements)
                 pass
@@ -229,7 +239,7 @@ class Interface:
         sentence = input()
         return sentence
 
-    def __manual_prediction(self):
+    def __manual_prediction(self) -> None:
         sentence = Interface.__input_sentence()
         while sentence != 'quit':
             if self.bow_model:
@@ -239,7 +249,7 @@ class Interface:
             print(f'Prediction: {str(prediction[0])}')
             sentence = Interface.__input_sentence()
 
-    def __simple_dialog(self):
+    def __simple_dialog(self) -> None:
         print('\n###################################')
         possible_choices = get_possible_choices('./data/restaurant_info_copy_.csv')
         possible_restaurants = get_possible_restaurants('./data/restaurant_info_copy_.csv')
@@ -256,3 +266,58 @@ class Interface:
             print('')
             if sentence:
                 sm.state_transition(sentence)
+
+    def __experiment(self) -> None:
+        cls = lambda: os.system('cls' if os.name == 'nt' else 'clear')
+        cls()
+
+        print('\n###################################')
+        print('There are three slightly different dialogs in the experiment. '
+              f'To end the current conversation, say {colorama.Fore.YELLOW}bye{colorama.Style.RESET_ALL} or something similar.')
+        print(f'Remember to {colorama.Fore.RED}TURN ON YOUR SPEAKERS{colorama.Style.RESET_ALL}')
+        print('Have fun!')
+        print('###################################')
+
+        possible_choices = get_possible_choices('./data/restaurant_info_copy_.csv')
+        possible_restaurants = get_possible_restaurants('./data/restaurant_info_copy_.csv')
+
+        tts_list = [(True, False), (True, True), (False, False)]
+        random.shuffle(tts_list)
+
+        tts_string = ''.join(f'{int(pair[0])}{int(pair[1])}' for pair in tts_list)
+
+        input(f"Press {colorama.Fore.YELLOW}Enter{colorama.Style.RESET_ALL} to start...")
+
+        for idx, tts in enumerate(tts_list):
+            cls()
+            print('\n###################################')
+            print(f'{colorama.Fore.GREEN}Starting dialog {idx+1}...{colorama.Style.RESET_ALL}')
+            print('###################################')
+            sm = DialogSMLogic(possible_choices, self.__model, self.vectorizer, possible_restaurants,
+                                    delay=self.delay,
+                                    tts=tts[0], tts_female=tts[1])
+
+            sm.start()
+            end = False
+            while not end:
+                if self.asr:
+                    sentence = automatic_speech_recognition()
+                    print(f'{colorama.Fore.BLUE}USER{colorama.Style.RESET_ALL}:', sentence)
+                else:
+                    sentence = input(f'{colorama.Fore.BLUE}USER{colorama.Style.RESET_ALL}: ')
+
+                print('')
+
+                if sentence:
+                    end = sm.state_transition(sentence)
+            del sm
+            print('###################################')
+            input(f"Press {colorama.Fore.YELLOW}Enter{colorama.Style.RESET_ALL} to continue...")
+
+        cls()
+        print('\n###################################')
+        print("That's it. Please complete the survey now.\n"
+              "Copy the code below because we'll ask for it in the survey:\n"
+              f"{colorama.Fore.RED}{tts_string}{colorama.Style.RESET_ALL}\n\n"
+              "Thank you for your participation!")
+        print('###################################')

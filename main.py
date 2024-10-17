@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--filename', dest='datapath',
                         default='dialog_acts.dat', help='File in data folder in .dat format')
     parser.add_argument('-t', '--task', dest='task',
-                        default='1B', help='Project subpart to run')
+                        default='2', help='Project subpart to run')
     parser.add_argument('-m', '--model', dest='model_name', default='fnn',
                         help="""Model to train and predict:
                                 bm: BaselineMajor
@@ -44,8 +44,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    args.drop_duplicates = True if args.drop_duplicates == 'True' else False
-    args.hyper_param_tuning = True if args.hyper_param_tuning == 'True' else False
+    args.drop_duplicates = True
 
     interface = Interface(datapath=args.datapath, model=args.model_name, drop_duplicates=args.drop_duplicates,
                           evaluate=args.evaluate, task=args.task, hyper_param_tuning=args.hyper_param_tuning, 

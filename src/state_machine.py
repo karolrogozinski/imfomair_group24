@@ -1,10 +1,8 @@
 """ Standard libraries
-sys: basic system operations, like closing app
 datetime: adding timestamps
 """
 import re
 import random
-import sys
 import time
 
 """ Third-party libraries
@@ -13,11 +11,14 @@ typing: typing purposes
 sklearn: vectorizer
 textdistance: calculating Lavenshtein distance
 pyttsx3: engine to perform TTS
+colorama: coloring console text
 """
 import pandas as pd
 import numpy as np
 
-from typing import Dict, List, Tuple
+import colorama
+
+from typing import Dict, List, Tuple, Optional
 
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -149,14 +150,16 @@ class DialogSMLogic:
         self.delay: int = delay
         self.dialog_machine: DialogSMOutputs = DialogSMOutputs(tts=tts, tts_female=tts_female)
 
-        self.dialog_machine.get_dialog_option(self.next_state, self.dialog_args)
-
-    def state_transition(self, sentence: str):
+    def state_transition(self, sentence: str) -> Optional[bool]:
         self.current_speech_act = self.__recognize_speech_act(sentence)
         if self.current_speech_act == 'bye':
             self.__exit()
+            return True
         self.transition_dict[self.next_state](sentence)
         time.sleep(self.delay)
+        self.dialog_machine.get_dialog_option(self.next_state, self.dialog_args)
+
+    def start(self) -> None:
         self.dialog_machine.get_dialog_option(self.next_state, self.dialog_args)
 
     def __state_0(self, sentence: str) -> None:
@@ -621,7 +624,6 @@ class DialogSMLogic:
         """ Close the program
         """
         self.dialog_machine.get_dialog_option(-1, ())
-        sys.exit()
 
 
 class DialogSMOutputs:
@@ -631,11 +633,23 @@ class DialogSMOutputs:
         Each of them takes dialog options as input to parametrize sentences.
     """
     def __init__(self, tts: bool = False, tts_female: bool = False) -> None:
+        colorama.init()
+
         self.tts = tts
         if tts:
             self.tts_engine = pyttsx3.init()
+
+            voices = self.tts_engine.getProperty('voices')
+
+            male_voice = random.choice([voice for voice in voices
+                          if voice.gender == 'VoiceGenderMale' and voice.languages==['en_GB']])
+            female_voice = random.choice([voice for voice in voices
+                          if voice.gender == 'VoiceGenderFemale' and voice.languages==['en_US']])
+
             if tts_female:
-                self.tts_engine.setProperty('voice', 'com.apple.speech.synthesis.voice.samantha')
+                self.tts_engine.setProperty('voice', female_voice.id)
+            else:
+                self.tts_engine.setProperty('voice', male_voice.id)
 
     def get_dialog_option(self, state_number: int, options: Tuple = ()) -> None:
         transition_dict = {
@@ -651,7 +665,7 @@ class DialogSMOutputs:
             -1: DialogSMOutputs.__exit,
         }
         text = transition_dict[state_number](options)
-        print('ASSISTANT: ', text)
+        print(f'{colorama.Fore.BLUE}ASSISTANT: {colorama.Style.RESET_ALL}', text)
         if self.tts:
             self.tts_engine.say(text)
             self.tts_engine.runAndWait()

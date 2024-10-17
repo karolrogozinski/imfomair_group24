@@ -5,3 +5,5 @@ reports/eval/
 venv
 playgroud.ipynb
 tmp
+.dist
+main.spec
