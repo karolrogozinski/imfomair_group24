@@ -446,17 +446,20 @@ class DialogSMLogic:
     def __update_dislikes(self, negations: List[str], field: str, max_distance: int, from_8=False) -> None:
         current_word = None
 
-        for word in negations:
-            for value in self.possible_choices[field]:
-                if textdistance.levenshtein(word, value) <= max_distance:
-                    current_word = value
-                    max_distance = textdistance.levenshtein(word, value)
+        try:
+            for word in negations:
+                for value in self.possible_choices[field]:
+                    if textdistance.levenshtein(word, value) <= max_distance:
+                        current_word = value
+                        max_distance = textdistance.levenshtein(word, value)
 
-        if current_word:
-            if not from_8:
-                self.antipathies[field].append(current_word)
-                if current_word in self.preferences[field]:
-                    self.preferences[field].remove(current_word)
+            if current_word:
+                if not from_8:
+                    self.antipathies[field].append(current_word)
+                    if current_word in self.preferences[field]:
+                        self.preferences[field].remove(current_word)
+        except:
+            pass
             #else:
             #    self.secondary_antipathies[field].append(current_word)
             #    if current_word in self.secondary_preferences[field]:
