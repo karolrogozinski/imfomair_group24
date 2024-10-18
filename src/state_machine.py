@@ -815,29 +815,34 @@ Please provide {text} again.""".replace(
 
         text = ''
 
-        if food or price_range or options[5]:
-            text += name.title() + ' is '
+        try:
 
-            if food and price_range:
-                text += food + ', ' + price_range + ' restaurant'
-            elif food:
-                text += food + ' restaurant'
-            else:
-                text += price_range + ' restaurant'
+            if food or price_range or options[5]:
+                text += name.title() + ' is '
+
+                if food and price_range:
+                    text += food + ', ' + price_range + ' restaurant'
+                elif food:
+                    text += food + ' restaurant'
+                else:
+                    text += price_range + ' restaurant'
 
 
-            if options[5]:
-                area = options[5][0]
-                address = options[5][1]
-                text += ' located in the ' + area + 'part of the town at ' + address
+                if options[5]:
+                    area = options[5][0]
+                    address = options[5][1]
+                    text += ' located in the ' + area + 'part of the town at ' + address
 
-            text += '. '
+                text += '. '
 
-        if zipcode:
-            text += 'The zipcode is ' + zipcode + '.'
+            if zipcode:
+                text += 'The zipcode is ' + zipcode + '.'
 
-        if phone:
-            text += 'To contact them you can call ' + phone + '.'
+            if phone:
+                text += 'To contact them you can call ' + phone + '.'
+        
+        except:
+            pass
 
         return text or 'Sorry I do not understand your request.'
 
