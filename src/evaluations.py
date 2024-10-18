@@ -39,10 +39,10 @@ class ClassifierEvaluation:
         """Prints the precision, recall, and F1-score for the model."""
         print("Classification Report:")
         self.prec_recall_f1 = classification_report(self.y_true, self.y_pred, zero_division=1)
-        self.prec = precision_score(self.y_true, self.y_pred, average="macro", zero_division=1)
+        self.prec = precision_score(self.y_true, self.y_pred, average="micro", zero_division=1)
         self.recall = recall_score(self.y_true, self.y_pred, average="macro", zero_division=1)
         self.f1_score = f1_score(self.y_true, self.y_pred, average="macro", zero_division=1)
-
+        print(self.prec )
     def save_confusion_matrix(self, model, drop_duplicates) -> None:
         """Creates and saves the confusion matrix as a PNG file."""
         plt.figure(figsize=(10, 8))

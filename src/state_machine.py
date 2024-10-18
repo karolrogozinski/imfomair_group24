@@ -32,7 +32,7 @@ from src.models import Model
 
 DONTCARE_WORDS = ['any', 'dontcare', 'doesnt matter', "don't care", "doesn't matter", 'whatever', 'dont care']
 REQUEST_WORDS = {
-    'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree', 'indian', 'british', 'african', 'asian',
+    'food': ['cuisine', 'food', 'food type', 'dish', 'meal', 'menu', 'entree', 'indian', 'british', 'african', 'asian oriental',
              'australaisan', 'bistro', 'catalan', 'chinese', 'cuban', 'european', 'french', 'fusion', 'gastropub',
              'international', 'italian', 'jamaican', 'japanese', 'korean', 'lebanese', 'mediterranean', 'moroccan',
              'american', 'persian', 'polynesian', 'portuguese', 'romanian', 'seafood', 'spanish', 'steakhouse', 'swiss',
