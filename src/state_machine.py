@@ -644,15 +644,22 @@ class DialogSMOutputs:
 
             voices = self.tts_engine.getProperty('voices')
 
-            male_voice = random.choice([voice for voice in voices
-                          if voice.gender == 'VoiceGenderMale' and voice.languages==['en_GB']])
-            female_voice = random.choice([voice for voice in voices
-                          if voice.gender == 'VoiceGenderFemale' and voice.languages==['en_US']])
-
             if tts_female:
-                self.tts_engine.setProperty('voice', female_voice.id)
+                try:
+                    female_voice = random.choice([voice for voice in voices
+                        if voice.gender == 'VoiceGenderFemale' and voice.languages == ['en_US']])
+                    voice_id = female_voice.id
+                except IndexError: # for Windows
+                    voice_id = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0'
             else:
-                self.tts_engine.setProperty('voice', male_voice.id)
+                try:
+                    male_voice = random.choice([voice for voice in voices
+                        if voice.gender == 'VoiceGenderMale' and voice.languages==['en_GB']])
+                    voice_id = male_voice.id
+                except IndexError:
+                    voice_id = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_DAVID_11.0'
+
+            self.tts_engine.setProperty('voice', voice_id)
 
     def get_dialog_option(self, state_number: int, options: Tuple = ()) -> None:
         transition_dict = {
