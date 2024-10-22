@@ -6,6 +6,7 @@ random: shuffling samples for experiment
 import sys
 import os
 import random
+import time
 from datetime import datetime
 
 """ Third-party libraries
@@ -321,3 +322,6 @@ class Interface:
               f"{colorama.Fore.RED}{tts_string}{colorama.Style.RESET_ALL}\n\n"
               "Thank you for your participation!")
         print('###################################')
+        time.sleep(1000)
+
+
