@@ -3,10 +3,11 @@ from scipy import stats
 import numpy as np
 
 # Load Excel file
-df = pd.read_excel('data/experiment_results.xlsx')
+df = pd.read_excel('data/experiment_results.xlsx').iloc[:-1]
 
 # Define the column pairs you want to compare
-column_pairs = [('FEMALE_COMPETENCE_N', 'MALE_COMPETENCE_N'), ('FEMALE_BENEVOLENCE_N', 'MALE_BENEVOLENCE_N'), ('FEMALE_INTEGRITY_N', 'MALE_INTEGRITY_N')]
+column_pairs_n = [('FEMALE_COMPETENCE_N', 'MALE_COMPETENCE_N'), ('FEMALE_BENEVOLENCE_N', 'MALE_BENEVOLENCE_N'), ('FEMALE_INTEGRITY_N', 'MALE_INTEGRITY_N')]
+column_pairs = [('FEMALE_COMPETENCE', 'MALE_COMPETENCE'), ('FEMALE_BENEVOLENCE', 'MALE_BENEVOLENCE'), ('FEMALE_INTEGRITY', 'MALE_INTEGRITY')]
 
 # Initialize an empty list to store the results
 results = []
@@ -32,10 +33,12 @@ for col1, col2 in column_pairs:
     
     # Append results for each pair as a dictionary
     results.append({
+        # f'Mean {col1}': mean1,
+        # f'Mean {col2}': mean2,
         'Column Pair': f'{col1} vs {col2}',
         'T-statistic': t_stat,
         'P-value': p_value,
-        'Cohen\'s d': cohens_d
+        'Cohen\'s d': cohens_d,
     })
 
 # Convert the results list to a DataFrame
